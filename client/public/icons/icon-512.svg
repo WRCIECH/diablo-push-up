@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0a0605"/>
+  <rect x="16" y="16" width="480" height="480" fill="none" stroke="#6b4f1a" stroke-width="6"/>
+  <rect x="24" y="24" width="464" height="464" fill="none" stroke="#c4991e" stroke-width="2"/>
+  <!-- Skull -->
+  <circle cx="256" cy="218" r="140" fill="#6b0000"/>
+  <circle cx="256" cy="218" r="136" fill="#8b1a1a"/>
+  <!-- Eye sockets -->
+  <ellipse cx="212" cy="202" rx="34" ry="37" fill="#0a0605"/>
+  <ellipse cx="300" cy="202" rx="34" ry="37" fill="#0a0605"/>
+  <!-- Pupils / glow -->
+  <ellipse cx="212" cy="202" rx="18" ry="20" fill="#c41e1e" opacity="0.6"/>
+  <ellipse cx="300" cy="202" rx="18" ry="20" fill="#c41e1e" opacity="0.6"/>
+  <!-- Nose -->
+  <ellipse cx="256" cy="252" rx="18" ry="13" fill="#0a0605"/>
+  <!-- Jaw -->
+  <rect x="160" y="298" width="192" height="68" rx="14" fill="#8b1a1a"/>
+  <!-- Teeth -->
+  <rect x="167" y="303" width="28" height="38" rx="4" fill="#0a0605"/>
+  <rect x="205" y="303" width="28" height="38" rx="4" fill="#0a0605"/>
+  <rect x="243" y="303" width="28" height="38" rx="4" fill="#0a0605"/>
+  <rect x="281" y="303" width="28" height="38" rx="4" fill="#0a0605"/>
+  <rect x="319" y="303" width="28" height="38" rx="4" fill="#0a0605"/>
+  <!-- Crown horns -->
+  <polygon points="180,76 200,162 160,162" fill="#c4991e"/>
+  <polygon points="256,58 276,154 236,154" fill="#c4991e"/>
+  <polygon points="332,76 352,162 312,162" fill="#c4991e"/>
+  <!-- Gold ring -->
+  <circle cx="256" cy="218" r="143" fill="none" stroke="#c4991e" stroke-width="3"/>
+  <!-- Title text -->
+  <text x="256" y="430" text-anchor="middle" font-family="serif" font-size="32" font-weight="bold" fill="#c4991e" letter-spacing="4">DIABLO</text>
+  <text x="256" y="470" text-anchor="middle" font-family="serif" font-size="20" fill="#8b6914" letter-spacing="6">PUSH-UP</text>
+</svg>

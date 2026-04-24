@@ -1,0 +1,70 @@
+{
+  "weapons": [
+    { "id": "short_sword", "name": "Short Sword", "slot": "weapon", "damage": [2, 6], "durability": 24, "reqStr": 18, "reqDex": 0, "price": 120, "sell_price": 30 },
+    { "id": "club", "name": "Club", "slot": "weapon", "damage": [1, 6], "durability": 20, "reqStr": 0, "reqDex": 0, "price": 20, "sell_price": 5 },
+    { "id": "short_bow", "name": "Short Bow", "slot": "weapon", "damage": [1, 4], "durability": 30, "reqStr": 25, "reqDex": 30, "price": 100, "sell_price": 25 },
+    { "id": "long_sword", "name": "Long Sword", "slot": "weapon", "damage": [2, 8], "durability": 40, "reqStr": 30, "reqDex": 0, "price": 200, "sell_price": 50 },
+    { "id": "hand_axe", "name": "Hand Axe", "slot": "weapon", "damage": [3, 6], "durability": 24, "reqStr": 20, "reqDex": 0, "price": 80, "sell_price": 20 },
+    { "id": "mace", "name": "Mace", "slot": "weapon", "damage": [1, 8], "durability": 32, "reqStr": 16, "reqDex": 0, "price": 90, "sell_price": 22 },
+    { "id": "dagger", "name": "Dagger", "slot": "weapon", "damage": [1, 4], "durability": 16, "reqStr": 0, "reqDex": 20, "price": 30, "sell_price": 7 }
+  ],
+  "shields": [
+    { "id": "buckler", "name": "Buckler", "slot": "shield", "ac": 3, "durability": 20, "reqStr": 0, "price": 50, "sell_price": 12 },
+    { "id": "small_shield", "name": "Small Shield", "slot": "shield", "ac": 5, "durability": 24, "reqStr": 25, "price": 90, "sell_price": 22 },
+    { "id": "large_shield", "name": "Large Shield", "slot": "shield", "ac": 8, "durability": 32, "reqStr": 40, "price": 160, "sell_price": 40 }
+  ],
+  "helms": [
+    { "id": "cap", "name": "Cap", "slot": "helm", "ac": 2, "durability": 15, "reqStr": 0, "price": 15, "sell_price": 3 },
+    { "id": "skull_cap", "name": "Skull Cap", "slot": "helm", "ac": 4, "durability": 20, "reqStr": 15, "price": 30, "sell_price": 7 },
+    { "id": "helm", "name": "Helm", "slot": "helm", "ac": 6, "durability": 25, "reqStr": 25, "price": 75, "sell_price": 18 }
+  ],
+  "armor": [
+    { "id": "rags", "name": "Rags", "slot": "armor", "ac": 1, "durability": 15, "reqStr": 0, "price": 5, "sell_price": 1 },
+    { "id": "quilted_armor", "name": "Quilted Armor", "slot": "armor", "ac": 7, "durability": 25, "reqStr": 0, "price": 45, "sell_price": 11 },
+    { "id": "leather_armor", "name": "Leather Armor", "slot": "armor", "ac": 10, "durability": 30, "reqStr": 15, "price": 120, "sell_price": 30 },
+    { "id": "hard_leather", "name": "Hard Leather Armor", "slot": "armor", "ac": 14, "durability": 35, "reqStr": 20, "price": 200, "sell_price": 50 }
+  ],
+  "potions": [
+    { "id": "healing_potion", "name": "Healing Potion", "slot": "potion", "type": "healing", "heal": "partial", "price": 50, "sell_price": 12 },
+    { "id": "full_healing_potion", "name": "Full Healing Potion", "slot": "potion", "type": "healing", "heal": "full", "price": 150, "sell_price": 37 }
+  ],
+  "prefixes": {
+    "weapon": [
+      { "id": "tin", "name": "Tin", "bonus": { "damage_flat_min": 1, "damage_flat_max": 2 }, "price_mult": 1.5 },
+      { "id": "steel", "name": "Steel", "bonus": { "damage_flat_min": 2, "damage_flat_max": 4 }, "price_mult": 2.0 },
+      { "id": "iron", "name": "Iron", "bonus": { "damage_flat_min": 3, "damage_flat_max": 6 }, "price_mult": 2.5 },
+      { "id": "warriors", "name": "Warrior's", "bonus": { "damage_pct": 200 }, "price_mult": 5.0 }
+    ],
+    "armor": [
+      { "id": "leather_prefix", "name": "Leather", "bonus": { "ac_min": 1, "ac_max": 5 }, "price_mult": 1.5 },
+      { "id": "hard", "name": "Hard", "bonus": { "ac_min": 5, "ac_max": 10 }, "price_mult": 2.0 },
+      { "id": "fortified", "name": "Fortified", "bonus": { "ac_min": 15, "ac_max": 20 }, "price_mult": 3.0 }
+    ]
+  },
+  "suffixes": {
+    "weapon": [
+      { "id": "of_slaying", "name": "of Slaying", "bonus": { "damage_pct": 20 }, "price_mult": 1.5 },
+      { "id": "of_the_bear", "name": "of the Bear", "bonus": { "str_min": 5, "str_max": 10 }, "price_mult": 2.0 },
+      { "id": "of_accuracy", "name": "of Accuracy", "bonus": { "to_hit_flat": 10 }, "price_mult": 1.5 }
+    ],
+    "armor": [
+      { "id": "of_the_fox", "name": "of the Fox", "bonus": { "dex_min": 1, "dex_max": 5 }, "price_mult": 1.5 },
+      { "id": "of_vim", "name": "of Vim", "bonus": { "vit_min": 1, "vit_max": 5 }, "price_mult": 1.5 },
+      { "id": "of_health", "name": "of Health", "bonus": { "life_min": 10, "life_max": 20 }, "price_mult": 2.0 }
+    ]
+  },
+  "starting_equipment": {
+    "warrior": {
+      "weapon": "short_sword",
+      "shield": "buckler",
+      "backpack": ["club", "healing_potion", "healing_potion"],
+      "gold": 100
+    },
+    "rogue": {
+      "weapon": "short_bow",
+      "shield": null,
+      "backpack": ["healing_potion", "healing_potion"],
+      "gold": 100
+    }
+  }
+}

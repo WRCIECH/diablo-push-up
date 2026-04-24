@@ -1,0 +1,62 @@
+[
+  {
+    "id": "knee",
+    "name": "Knee Push-up",
+    "difficulty": 1,
+    "definition": "Knees on floor, straight line from knees to shoulders. Lower chest close to floor, full arm extension at top. Hips do not sag."
+  },
+  {
+    "id": "incline",
+    "name": "Incline Push-up",
+    "difficulty": 2,
+    "definition": "Hands on an elevated surface (bench, chair, wall). Straight body line from head to feet. Lower chest to the edge, full arm extension at top."
+  },
+  {
+    "id": "standard",
+    "name": "Standard Push-up",
+    "difficulty": 3,
+    "definition": "Full plank, hands shoulder-width apart. Chest touches the floor, elbows at 45–90 degrees. Full arm extension at top. Hips level throughout."
+  },
+  {
+    "id": "wide",
+    "name": "Wide Push-up",
+    "difficulty": 4,
+    "definition": "Hands wider than shoulder width. Chest touches the floor. Full arm extension at top."
+  },
+  {
+    "id": "decline",
+    "name": "Decline Push-up",
+    "difficulty": 5,
+    "definition": "Feet elevated on a surface. Straight body line. Lower chest near the floor, full arm extension. Difficulty increases with higher foot elevation."
+  },
+  {
+    "id": "close_grip",
+    "name": "Close-Grip Push-up",
+    "difficulty": 5,
+    "definition": "Hands placed under the sternum, elbows stay close to the body throughout. Lower chest to hands, full arm extension."
+  },
+  {
+    "id": "diamond",
+    "name": "Diamond Push-up",
+    "difficulty": 6,
+    "definition": "Thumbs and index fingers form a diamond shape. Lower sternum to hands, full arm extension."
+  },
+  {
+    "id": "t_pushup",
+    "name": "T Push-up",
+    "difficulty": 6,
+    "definition": "After each push-up, rotate torso and raise one arm to the ceiling forming a T shape. Alternate sides. Keep hips level."
+  },
+  {
+    "id": "archer",
+    "name": "Archer Push-up",
+    "difficulty": 7,
+    "definition": "Wide hand position. Shift weight to one arm while the other extends sideways. Lower chest to the working arm. Alternate sides each rep."
+  },
+  {
+    "id": "clap",
+    "name": "Clap Push-up",
+    "difficulty": 7,
+    "definition": "Explosive push-up. Hands leave the floor at the top, clap in the air, land softly and absorb with bent elbows."
+  }
+]

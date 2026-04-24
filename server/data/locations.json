@@ -1,0 +1,61 @@
+{
+  "levels": [
+    {
+      "id": 1,
+      "name": "Cathedral Level 1",
+      "type": "dungeon3",
+      "depth": 4,
+      "intro_texts": [
+        "You descend into the cathedral crypts. The air reeks of rot and sulfur. Three passages stretch before you into darkness.",
+        "Ancient stone groans beneath your boots as the catacombs swallow you whole. Torches flicker in a distant draft. Three corridors await your choice.",
+        "The dead do not rest here. You feel their hunger as you step into the gloom. Three paths diverge before you.",
+        "Shadows cling to the cathedral walls like old sin. Something skitters in the darkness ahead. Three passages beckon.",
+        "The weight of the earth presses down as you enter. The smell of death is overwhelming. Choose your path carefully."
+      ],
+      "place_pool": [
+        { "type": "fight", "monster": "Zombie",              "weight": 12, "cryptic_chance": 0.4 },
+        { "type": "fight", "monster": "Ghoul",               "weight": 6,  "cryptic_chance": 0.5 },
+        { "type": "fight", "monster": "Fallen One (spear)",  "weight": 12, "cryptic_chance": 0.3 },
+        { "type": "fight", "monster": "Fallen One (sword)",  "weight": 8,  "cryptic_chance": 0.3 },
+        { "type": "fight", "monster": "Skeleton",            "weight": 15, "cryptic_chance": 0.5 },
+        { "type": "nothing",                                  "weight": 27, "cryptic_chance": 0.65 },
+        { "type": "level",  "target_level": 2,               "weight": 20, "cryptic_chance": 0.3 }
+      ],
+      "descriptions": {
+        "cryptic": {
+          "fight": [
+            "A darkened passage. Something moves within.",
+            "An eerie silence emanates from this corridor. Too quiet.",
+            "You sense a malevolent presence just beyond your sight.",
+            "The torchlight bends away from this passage.",
+            "Scratch marks cover the walls leading this way.",
+            "A low moan echoes from the darkness ahead.",
+            "The stench of death grows stronger in this direction."
+          ],
+          "nothing": [
+            "A shadowed path leads into the unknown.",
+            "The corridor stretches into darkness.",
+            "Uncertain terrain lies ahead.",
+            "The passage seems clear — but looks can deceive.",
+            "Dust-covered stones lead deeper in."
+          ],
+          "level": [
+            "A passage descends deeper into the earth.",
+            "Ancient stairs lead further down into the abyss.",
+            "The darkness below feels different. Heavier.",
+            "Cold air rises from below."
+          ]
+        },
+        "visible": {
+          "Zombie":              "A shambling undead corpse blocks the path ahead.",
+          "Ghoul":               "A hunched ghoul prowls the corridor, seeking flesh.",
+          "Fallen One (spear)":  "A frenzied Fallen One brandishes a rusted spear.",
+          "Fallen One (sword)":  "A Fallen One clutches a chipped sword, shrieking curses.",
+          "Skeleton":            "An animated skeleton guards the passage with hollow eyes.",
+          "nothing":             "The path ahead appears clear — for now.",
+          "level":               "Stairs descend deeper into the cathedral's bowels."
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Zombie",
+    "type": "Undead",
+    "dlvl": [1, 2],
+    "hp": [4, 7],
+    "vitality": 5,
+    "damage": [2, 5],
+    "ac": 5,
+    "toHit": 10,
+    "exp": 54,
+    "gold_drop": [1, 16],
+    "push_up_types": ["standard", "standard", "standard", "knee", "incline"],
+    "description": "A shambling undead corpse, slow but relentless. Rotting flesh and hollow eyes."
+  },
+  {
+    "name": "Ghoul",
+    "type": "Undead",
+    "dlvl": [2, 3],
+    "hp": [7, 11],
+    "vitality": 9,
+    "damage": [3, 10],
+    "ac": 10,
+    "toHit": 10,
+    "exp": 58,
+    "gold_drop": [1, 20],
+    "push_up_types": ["standard", "standard", "wide", "incline", "standard"],
+    "description": "A hunched ghoul with jagged claws. Stronger than a zombie and harder to put down."
+  },
+  {
+    "name": "Fallen One (spear)",
+    "type": "Animal",
+    "dlvl": [1, 3],
+    "hp": [1, 4],
+    "vitality": 2,
+    "damage": [1, 3],
+    "ac": 0,
+    "toHit": 15,
+    "exp": 46,
+    "gold_drop": [1, 10],
+    "push_up_types": ["knee", "incline", "knee"],
+    "description": "A scrawny demon imp wielding a rusted spear. Weak but surprisingly quick."
+  },
+  {
+    "name": "Fallen One (sword)",
+    "type": "Animal",
+    "dlvl": [1, 3],
+    "hp": [2, 5],
+    "vitality": 3,
+    "damage": [1, 4],
+    "ac": 10,
+    "toHit": 15,
+    "exp": 52,
+    "gold_drop": [1, 10],
+    "push_up_types": ["knee", "standard", "incline"],
+    "description": "A small demon clutching a chipped sword, shrieking battle cries in an unknown tongue."
+  },
+  {
+    "name": "Skeleton",
+    "type": "Undead",
+    "dlvl": [1, 2],
+    "hp": [2, 4],
+    "vitality": 3,
+    "damage": [1, 4],
+    "ac": 0,
+    "toHit": 20,
+    "exp": 64,
+    "gold_drop": [1, 14],
+    "push_up_types": ["standard", "incline", "standard"],
+    "description": "An animated skeleton warrior. Low on life but strikes with alarming precision."
+  }
+]
