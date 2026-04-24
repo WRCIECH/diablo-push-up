@@ -2,12 +2,17 @@ import React from 'react';
 import { useGame, EXP_TABLE } from '../context/GameContext.jsx';
 import { calcAC, calcToHit, calcReductionPoolRange, calcPushUpStats } from '../utils/player.js';
 import { resolveItemName, qualityColor, getItemStatLine } from '../utils/items.js';
+import { useMusic, getCurrentTrack } from '../hooks/useMusic.js';
+
+const TRISTRAM = '/audio/tristram.mp3';
 
 const STAT_LABELS = { strength: 'Strength', dexterity: 'Dexterity', vitality: 'Vitality' };
 const CLASS_LABEL  = { warrior: 'Warrior', rogue: 'Rogue' };
 const SLOT_LABELS  = { weapon: 'Weapon', armor: 'Armor', helm: 'Helm', shield: 'Shield' };
 
 export default function CharacterScreen() {
+  // Continue whatever music was playing before (Tristram if from hub, nothing if from dungeon)
+  useMusic(getCurrentTrack());
   const { state, dispatchAndSave, setScreen } = useGame();
   const player = state.player;
 

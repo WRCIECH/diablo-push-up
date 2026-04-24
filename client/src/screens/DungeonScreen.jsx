@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useGame } from '../context/GameContext.jsx';
+import { useMusic } from '../hooks/useMusic.js';
 import {
   getChildDescription,
   getArrivalMessage,
@@ -71,6 +72,7 @@ function IntroScreen({ introText, levelName, onProceed }) {
 // ── Main dungeon navigation ───────────────────────────────────────────────────
 
 export default function DungeonScreen() {
+  useMusic(null);   // stop Tristram music on dungeon entry
   const { state, dispatchAndSave, setScreen, gameData } = useGame();
   const dungeon = state.dungeon;
 

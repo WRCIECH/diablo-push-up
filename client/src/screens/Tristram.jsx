@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 import { isPenaltyActive, penaltyRemaining } from '../utils/player.js';
 import { generateDungeon } from '../utils/dungeon.js';
+import { useMusic } from '../hooks/useMusic.js';
 
 export default function Tristram() {
   const { state, dispatchAndSave, setScreen, generateShop, gameData } = useGame();
   const player = state?.player;
   const [penaltyText, setPenaltyText] = useState('');
   const penaltyOn = isPenaltyActive(state.penaltyUntil);
+
+  const { muted, toggleMute, blocked } = useMusic('/audio/tristram.mp3', { volume: 0.45 });
 
   // Clear expired penalty
   useEffect(() => {
@@ -35,13 +38,17 @@ export default function Tristram() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
         <div className="title-large" style={{ fontSize: 'clamp(18px, 5vw, 26px)' }}>Tristram</div>
-        <button
-          className="btn btn-ghost"
-          style={{ padding: '6px 12px', fontSize: '11px' }}
-          onClick={() => setScreen('character')}
-        >
-          ⚔ Character
-        </button>
+        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          {/* Music toggle — only shown when audio file is present */}
+          <MuteButton muted={muted} blocked={blocked} onToggle={toggleMute} />
+          <button
+            className="btn btn-ghost"
+            style={{ padding: '6px 12px', fontSize: '11px' }}
+            onClick={() => setScreen('character')}
+          >
+            ⚔ Character
+          </button>
+        </div>
       </div>
 
       {/* Penalty banner */}
@@ -111,6 +118,24 @@ export default function Tristram() {
         </button>
       </div>
     </div>
+  );
+}
+
+function MuteButton({ muted, blocked, onToggle }) {
+  const label = blocked ? '▶ Music' : muted ? '🔇' : '🔊';
+  const title = blocked
+    ? 'Click to start music'
+    : muted ? 'Unmute music' : 'Mute music';
+
+  return (
+    <button
+      className="btn btn-ghost"
+      style={{ padding: '6px 10px', fontSize: '13px', minWidth: '36px' }}
+      onClick={onToggle}
+      title={title}
+    >
+      {label}
+    </button>
   );
 }
 

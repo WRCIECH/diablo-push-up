@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 import { resolveItemName, qualityColor, getItemStatLine } from '../utils/items.js';
+import { useMusic } from '../hooks/useMusic.js';
 
 const DIALOGS = {
   idle:      "Welcome, friend! Come to stock up before heading back into those cursed catacombs? Smart thinking. Have a look — finest quality, I assure you!",
@@ -71,6 +72,7 @@ function ItemRow({ item, action, actionLabel, actionDisabled, gold }) {
 }
 
 export default function GriswoldScreen() {
+  useMusic('/audio/tristram.mp3');   // continue Tristram music
   const { state, dispatchAndSave, setScreen, shopInventory } = useGame();
   const player = state.player;
   const [tab, setTab] = useState('buy');

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 import { resolveItemName, qualityColor } from '../utils/items.js';
+import { useMusic } from '../hooks/useMusic.js';
 
 const IDENTIFY_COST = 100;
 
@@ -40,6 +41,7 @@ function CainPortrait() {
 }
 
 export default function CainScreen() {
+  useMusic('/audio/tristram.mp3');   // continue Tristram music
   const { state, dispatchAndSave, setScreen } = useGame();
   const player = state.player;
 

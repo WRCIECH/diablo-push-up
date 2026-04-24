@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 import { generateUID } from '../utils/items.js';
+import { useMusic } from '../hooks/useMusic.js';
 
 const POTIONS = [
   { id: 'healing_potion',      name: 'Healing Potion',      heal: 'partial', price: 50,  sell_price: 12 },
@@ -42,6 +43,7 @@ function PepinPortrait() {
 }
 
 export default function PepinScreen() {
+  useMusic('/audio/tristram.mp3');   // continue Tristram music
   const { state, dispatchAndSave, setScreen } = useGame();
   const player = state.player;
   const [dialog, setDialog] = useState('idle');

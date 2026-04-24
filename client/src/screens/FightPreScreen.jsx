@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGame, EXP_TABLE } from '../context/GameContext.jsx';
+import { useMusic } from '../hooks/useMusic.js';
 import { calculateFight, aggregatePushUps, formatTime, pct, C } from '../utils/combat.js';
 import { rollBetween, generateUID } from '../utils/items.js';
 import { rollLoot } from '../utils/loot.js';
@@ -114,6 +115,7 @@ function calcNewLevel(player, expGain) {
 // ── Main fight screen ─────────────────────────────────────────────────────────
 
 export default function FightPreScreen() {
+  useMusic(null);   // no music during fights
   const { state, dispatchAndSave, setScreen, gameData, setLootResult } = useGame();
   const dungeon  = state.dungeon;
   const node     = dungeon?.nodes[dungeon?.currentNodeId];
