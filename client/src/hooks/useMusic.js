@@ -100,22 +100,23 @@ export function toggleMusicMute() {
  *   src = null                   → stop music
  *   src = undefined              → no-op (screen doesn't care about music)
  *
- * Call requestMusic() in the screen's body (not inside useEffect) so the
- * decision is synchronous during the first render before any cleanup fires.
- * The hook just subscribes to state changes for the mute button.
+ * requestMusic() runs inside useEffect — never during render — so it never
+ * triggers setState on another component mid-render (React error #301).
  */
 export function useMusic(src) {
-  // Synchronously apply the music request on every render where src changes
-  // (this is safe — requestMusic is idempotent for the same src)
-  if (src !== undefined) requestMusic(src);
-
   const [, forceUpdate] = useState(0);
 
+  // Subscribe to singleton state changes (drives mute-button re-renders)
   useEffect(() => {
     const fn = () => forceUpdate(n => n + 1);
     listeners.add(fn);
     return () => listeners.delete(fn);
   }, []);
+
+  // Apply the music request after render, once old components have cleaned up
+  useEffect(() => {
+    if (src !== undefined) requestMusic(src);
+  }, [src]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     muted:       state.muted,
