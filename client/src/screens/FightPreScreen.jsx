@@ -228,6 +228,7 @@ export default function FightPreScreen() {
       newLevel,
       leveledUp: newLevel > player.level,
       loot:     lootItem,
+      monster,
     });
     setScreen('loot');
   }

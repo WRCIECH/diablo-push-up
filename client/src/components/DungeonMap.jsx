@@ -1,10 +1,10 @@
 import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 
 // ── Layout constants (exported for reuse in DungeonScreen minimap) ───────────
-export const ROOM = 14;  // room square size (px)
-export const COL  = 20;  // horizontal space per leaf slot — gap 6px, HIT 2px each side = no overlap
-export const ROW  = 40;  // vertical space between depth levels
-export const PAD  = 20;  // SVG padding on all sides
+export const ROOM = 28;  // room square size (px)
+export const COL  = 40;  // horizontal space per leaf slot
+export const ROW  = 58;  // vertical space between depth levels
+export const PAD  = 24;  // SVG padding on all sides
 
 // ── Tree layout ───────────────────────────────────────────────────────────────
 // Two-pass algorithm:
@@ -52,14 +52,21 @@ export function getVis(node, nodes) {
 // ── Room colours ──────────────────────────────────────────────────────────────
 
 function roomStyle(node, isCurrent, vis) {
-  if (isCurrent)    return { fill: '#2a1e06', stroke: '#f0c040', sw: 1.5 };
-  if (vis === 'dim') return { fill: '#0c0906', stroke: '#201812', sw: 0.8 };
+  if (isCurrent) return { fill: '#2a1e06', stroke: '#f0c040', sw: 2 };
 
-  // Entrance and stairs keep their own colours; everything else visited = green
+  if (vis === 'dim') {
+    if (node.type === 'fight') return { fill: '#160a0a', stroke: '#3a1212', sw: 1 };
+    if (node.type === 'level') return { fill: '#100e06', stroke: '#383010', sw: 1 };
+    return { fill: '#0c0c0a', stroke: '#222220', sw: 0.8 };
+  }
+
   switch (node.type) {
-    case 'entrance': return { fill: '#1e1408', stroke: '#c4991e', sw: 1.2 };
-    case 'level':    return { fill: '#141008', stroke: '#7a5a10', sw: 1 };
-    default:         return { fill: '#071407', stroke: '#2a7a2a', sw: 1 };
+    case 'entrance': return { fill: '#1e1408', stroke: '#c4991e', sw: 1.5 };
+    case 'level':    return { fill: '#141008', stroke: '#8a6a14', sw: 1.2 };
+    case 'fight':    return node.defeated
+      ? { fill: '#071407', stroke: '#2a6a2a', sw: 1.2 }
+      : { fill: '#1e0808', stroke: '#9a2020', sw: 1.5 };
+    default:         return { fill: '#0a0f0a', stroke: '#204020', sw: 1 };
   }
 }
 
@@ -111,13 +118,13 @@ export default function DungeonMap({ dungeon, onClose, inline, onNavigate, onBac
   // All visited rooms (except current) are clickable — player can jump to any visited location
   const clickableIds = useMemo(() => {
     const ids = new Set();
-    // Fast-travel: any previously visited room
     for (const [id, node] of Object.entries(nodes)) {
-      if (node.visited && id !== currentNodeId) ids.add(id);
-    }
-    // Explore: unvisited children of current node (adjacent, not yet entered)
-    for (const childId of (nodes[currentNodeId]?.childrenIds ?? [])) {
-      if (!nodes[childId]?.visited) ids.add(childId);
+      if (id === currentNodeId) continue;
+      if (node.visited) {
+        ids.add(id); // fast-travel to any visited room
+      } else if (getVis(node, nodes) === 'dim') {
+        ids.add(id); // any revealed-but-unvisited room (parent was entered)
+      }
     }
     return ids;
   }, [nodes, currentNodeId]);
@@ -301,8 +308,7 @@ export default function DungeonMap({ dungeon, onClose, inline, onNavigate, onBac
               const ry = pos[node.id].y      + PAD;
               const { fill, stroke, sw } = roomStyle(node, isCurrent, vis);
 
-              // Larger invisible hit area for adjacent nodes (tap target)
-              const HIT = 2;  // 2px extension each side — 14+4=18px total, 2px gap to next node (no overlap)
+              const HIT = 2;
 
               return (
                 <g key={`r-${node.id}`}
@@ -313,26 +319,28 @@ export default function DungeonMap({ dungeon, onClose, inline, onNavigate, onBac
                           fill="#c4991e" opacity="0.18"/>
                   )}
                   {/* Room square */}
-                  <rect x={rx} y={ry} width={ROOM} height={ROOM} rx="2"
+                  <rect x={rx} y={ry} width={ROOM} height={ROOM} rx="3"
                         fill={fill} stroke={stroke} strokeWidth={sw}/>
-                  {/* Red dot = enemy present */}
-                  {node.type === 'fight' && !node.defeated && vis !== 'hidden' && (
-                    <circle cx={rx + ROOM/2} cy={ry + ROOM/2} r="1.8" fill="#cc2222"
-                            opacity={vis === 'dim' ? 0.55 : 1}/>
+                  {/* Fight icon */}
+                  {node.type === 'fight' && !isCurrent && (
+                    <text x={rx + ROOM/2} y={ry + ROOM/2 + 5}
+                          textAnchor="middle" fontSize="13"
+                          fill={node.defeated ? '#2a6a2a' : '#cc3030'}
+                          opacity={vis === 'dim' ? 0.4 : 1}>
+                      {node.defeated ? '✓' : '⚔'}
+                    </text>
                   )}
-                  {/* Yellow dot = empty unvisited room */}
-                  {node.type === 'nothing' && !node.visited && vis !== 'hidden' && (
-                    <circle cx={rx + ROOM/2} cy={ry + ROOM/2} r="1.8" fill="#c4991e"
-                            opacity={vis === 'dim' ? 0.55 : 1}/>
-                  )}
-                  {/* Stairs glyph */}
-                  {vis === 'full' && node.type === 'level' && (
-                    <text x={rx + ROOM/2} y={ry + ROOM/2 + 2.5}
-                          textAnchor="middle" fontSize="7" fill="#c4991e">𓊍</text>
+                  {/* Stairs icon */}
+                  {node.type === 'level' && !isCurrent && (
+                    <text x={rx + ROOM/2} y={ry + ROOM/2 + 5}
+                          textAnchor="middle" fontSize="13"
+                          fill="#c4991e" opacity={vis === 'dim' ? 0.4 : 0.9}>
+                      ↓
+                    </text>
                   )}
                   {/* Current position marker */}
                   {isCurrent && (
-                    <circle cx={rx + ROOM/2} cy={ry + ROOM/2} r="2.8" fill="#f0c040"/>
+                    <circle cx={rx + ROOM/2} cy={ry + ROOM/2} r="5" fill="#f0c040"/>
                   )}
                   {/* Hit target: stops pointer capture so onClick fires */}
                   {isAdjacent && (
@@ -355,20 +363,21 @@ export default function DungeonMap({ dungeon, onClose, inline, onNavigate, onBac
         display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center',
       }}>
         {[
-          { color: '#f0c040', border: '#f0c040', label: 'You are here', dot: null },
-          { color: '#071407', border: '#2a7a2a', label: 'Visited',       dot: null },
-          { color: '#071407', border: '#2a7a2a', label: 'Enemy inside',  dot: '#cc2222' },
-          { color: '#071407', border: '#2a7a2a', label: 'Empty room',    dot: '#c4991e' },
-          { color: '#141008', border: '#7a5a10', label: 'Stairs ↓',      dot: null },
-          { color: '#0c0906', border: '#201812', label: 'Unseen',        dot: null },
-        ].map(({ color, border, label, dot }) => (
+          { fill: '#2a1e06', stroke: '#f0c040',  icon: '●', iconColor: '#f0c040', label: 'You are here' },
+          { fill: '#1e0808', stroke: '#9a2020',  icon: '⚔', iconColor: '#cc3030', label: 'Enemy'        },
+          { fill: '#071407', stroke: '#2a6a2a',  icon: '✓', iconColor: '#2a6a2a', label: 'Cleared'      },
+          { fill: '#141008', stroke: '#8a6a14',  icon: '↓', iconColor: '#c4991e', label: 'Stairs'       },
+          { fill: '#0a0f0a', stroke: '#204020',  icon: '',  iconColor: '',         label: 'Empty room'   },
+          { fill: '#0c0c0a', stroke: '#222220',  icon: '',  iconColor: '',         label: 'Unseen'       },
+        ].map(({ fill, stroke, icon, iconColor, label }) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <div style={{
-              width: 9, height: 9, flexShrink: 0, borderRadius: '2px',
-              background: color, border: `1px solid ${border}`,
+              width: 14, height: 14, flexShrink: 0, borderRadius: '3px',
+              background: fill, border: `1.5px solid ${stroke}`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '8px', color: iconColor, lineHeight: 1,
             }}>
-              {dot && <div style={{ width: 3, height: 3, borderRadius: '50%', background: dot }}/>}
+              {icon}
             </div>
             <span style={{ fontSize: '11px', color: 'var(--text-dim)' }}>{label}</span>
           </div>
