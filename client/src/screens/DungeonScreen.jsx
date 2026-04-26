@@ -28,7 +28,7 @@ function IntroScreen({ introText, levelName, onProceed }) {
 // ── Main screen ───────────────────────────────────────────────────────────────
 
 export default function DungeonScreen() {
-  useMusic(null);
+  const { muted, toggleMute, blocked } = useMusic('/audio/dungeon.wav');
   const { state, dispatchAndSave, setScreen, gameData } = useGame();
   const dungeon     = state.dungeon;
   const player      = state.player;
@@ -105,6 +105,10 @@ export default function DungeonScreen() {
           Cathedral · {roomDepth}
         </div>
         <div style={{ display: 'flex', gap: '6px' }}>
+          <button className="btn btn-ghost" style={{ padding: '5px 10px', fontSize: '13px' }}
+                  onClick={toggleMute} title={blocked ? 'Start music' : muted ? 'Unmute' : 'Mute'}>
+            {blocked ? '▶' : muted ? '🔇' : '🔊'}
+          </button>
           <button className="btn btn-ghost" style={{ padding: '5px 10px', fontSize: '12px' }}
                   onClick={() => setScreen('character')}>
             ⚔ Char
