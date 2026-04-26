@@ -5,6 +5,7 @@ import { calculateFight, aggregatePushUps, formatTime, pct, C } from '../utils/c
 import { rollBetween, generateUID } from '../utils/items.js';
 import { rollLoot } from '../utils/loot.js';
 import { getMonsters } from '../utils/dungeon.js';
+import ItemIcon from '../components/ItemIcon.jsx';
 
 // ── Monster portrait (SVG, type-coloured) ─────────────────────────────────────
 
@@ -186,11 +187,16 @@ export default function FightPreScreen() {
   function drinkPotion() {
     const potion = state.player.inventory.find(i => i.type === 'healing');
     if (!potion) return;
+    const isFull  = potion.heal === 'full';
+    const seconds = isFull ? fightData.vitalityBuffer : C.HEALING_POTION_SECONDS;
     if (timerRef.current.isBuffer) {
-      timerRef.current.buf += C.HEALING_POTION_SECONDS;
+      // Cap buffer at the max allowed by vitality
+      timerRef.current.buf = isFull
+        ? fightData.vitalityBuffer
+        : Math.min(fightData.vitalityBuffer, timerRef.current.buf + seconds);
       setTimerDisp(d => ({ ...d, seconds: timerRef.current.buf }));
     } else {
-      timerRef.current.main += C.HEALING_POTION_SECONDS;
+      timerRef.current.main += seconds;
       setTimerDisp(d => ({ ...d, seconds: timerRef.current.main }));
     }
     dispatchAndSave({ type: 'REMOVE_ITEM', payload: potion.uid });
@@ -279,7 +285,9 @@ export default function FightPreScreen() {
   // ── ACTIVE PHASE ──────────────────────────────────────────────────────────
 
   if (phase === 'active') {
+    const nextPotion  = state.player.inventory.find(i => i.type === 'healing');
     const potionCount = state.player.inventory.filter(i => i.type === 'healing').length;
+    const potionSecs  = nextPotion?.heal === 'full' ? fightData.vitalityBuffer : C.HEALING_POTION_SECONDS;
     const aggregated  = aggregatePushUps(fightData.finalPushUps);
 
     return (
@@ -336,21 +344,45 @@ export default function FightPreScreen() {
 
         {/* Potion + outcome buttons */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
-          <button
-            className="btn btn-ghost btn-full"
-            style={{ fontSize: '12px', opacity: potionCount > 0 ? 1 : 0.4 }}
-            disabled={potionCount === 0}
-            onClick={drinkPotion}
-          >
-            🧪 Drank Healing Potion (+{C.HEALING_POTION_SECONDS}s)
-            {potionCount > 0 && <span className="text-dim" style={{ marginLeft: '6px' }}>· {potionCount} left</span>}
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {/* Potion icon button */}
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <button
+                onClick={drinkPotion}
+                disabled={!nextPotion}
+                style={{
+                  width: 56, height: 56, borderRadius: '4px', cursor: nextPotion ? 'pointer' : 'default',
+                  background: nextPotion ? 'var(--bg-input)' : 'var(--bg-panel)',
+                  border: `1px solid ${nextPotion ? 'var(--border-mid)' : 'var(--border-dark)'}`,
+                  opacity: nextPotion ? 1 : 0.35,
+                  display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  justifyContent: 'center', gap: '2px',
+                }}
+              >
+                <ItemIcon item={nextPotion ?? { id: 'healing_potion', slot: 'potion', heal: 'partial' }} size={34}/>
+                <span style={{ fontSize: '9px', color: 'var(--text-dim)', lineHeight: 1 }}>
+                  +{potionSecs}s
+                </span>
+              </button>
+              {potionCount > 0 && (
+                <div style={{
+                  position: 'absolute', top: -6, right: -6,
+                  background: 'var(--bg-panel)', border: '1px solid var(--border-mid)',
+                  borderRadius: '50%', width: 18, height: 18,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '10px', fontWeight: 700, color: 'var(--text-cream)',
+                }}>
+                  {potionCount}
+                </div>
+              )}
+            </div>
 
-          <button className="btn btn-primary btn-full"
-                  style={{ fontSize: '14px', padding: '15px' }}
-                  onClick={handleWin}>
-            ⚔  I finished all push-ups — Victory
-          </button>
+            <button className="btn btn-primary"
+                    style={{ flex: 1, fontSize: '14px', padding: '15px' }}
+                    onClick={handleWin}>
+              ⚔  I finished all push-ups
+            </button>
+          </div>
 
           {lostConfirm ? (
             <div style={{ display: 'flex', gap: '8px' }}>
