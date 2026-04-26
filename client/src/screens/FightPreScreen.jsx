@@ -115,7 +115,7 @@ function calcNewLevel(player, expGain) {
 // ── Main fight screen ─────────────────────────────────────────────────────────
 
 export default function FightPreScreen() {
-  useMusic('/audio/dungeon.wav');
+  useMusic('/audio/dungeon.mp3');
   const { state, dispatchAndSave, setScreen, gameData, setLootResult } = useGame();
   const dungeon  = state.dungeon;
   const node     = dungeon?.nodes[dungeon?.currentNodeId];

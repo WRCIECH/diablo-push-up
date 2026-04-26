@@ -28,7 +28,7 @@ function IntroScreen({ introText, levelName, onProceed }) {
 // ── Main screen ───────────────────────────────────────────────────────────────
 
 export default function DungeonScreen() {
-  const { muted, toggleMute, blocked } = useMusic('/audio/dungeon.wav');
+  const { muted, toggleMute, blocked } = useMusic('/audio/dungeon.mp3');
   const { state, dispatchAndSave, setScreen, gameData } = useGame();
   const dungeon     = state.dungeon;
   const player      = state.player;
