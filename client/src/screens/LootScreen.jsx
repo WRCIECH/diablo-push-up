@@ -62,7 +62,13 @@ export default function LootScreen() {
       {/* Loot item */}
       <div className="scrollable" style={{ flex: 1, overflowY: 'auto', display: 'flex',
                                            flexDirection: 'column', gap: '8px' }}>
-        {!loot ? (
+        {!loot && gold > 0 ? (
+          <div className="panel" style={{ padding: '16px', textAlign: 'center' }}>
+            <div className="text-dim" style={{ fontStyle: 'italic', fontSize: '13px' }}>
+              The creature carried only gold.
+            </div>
+          </div>
+        ) : !loot ? (
           <div className="panel" style={{ padding: '16px', textAlign: 'center' }}>
             <div className="text-dim" style={{ fontStyle: 'italic', fontSize: '13px' }}>
               The creature carried nothing of value.

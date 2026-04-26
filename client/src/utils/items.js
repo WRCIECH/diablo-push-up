@@ -84,7 +84,10 @@ export function generateShopInventory(itemsData) {
     const prefix = (wantPre || !wantSuf) && availPre.length ? pickRandom(availPre) : null;
     const suffix = (wantSuf || !prefix)  && availSuf.length ? pickRandom(availSuf) : null;
 
-    return createMagicItem(base, prefix, suffix);
+    // Shop items are always identified — Griswold knows his own wares
+    const item = createMagicItem(base, prefix, suffix);
+    item.identified = true;
+    return item;
   });
 
   return [...normalItems, ...magicItems];
@@ -102,9 +105,38 @@ export function qualityColor(quality) {
   return 'var(--text-cream)';
 }
 
+function collectBonuses(item) {
+  if (!item.identified) return {};
+  const out = {};
+  for (const rolled of [item.prefix?.rolled, item.suffix?.rolled]) {
+    for (const [k, v] of Object.entries(rolled || {})) {
+      out[k] = (out[k] || 0) + v;
+    }
+  }
+  return out;
+}
+
 export function getItemStatLine(item) {
-  if (item.damage) return `DMG ${item.damage[0]}–${item.damage[1]}`;
-  if (item.ac !== undefined) return `AC ${item.ac}`;
-  if (item.type === 'healing') return `+${30} seconds in fight`;
-  return '';
+  if (item.type === 'healing') return '+30s in fight';
+
+  const b = collectBonuses(item);
+  const parts = [];
+
+  if (item.damage) {
+    const flat = b.damage_flat || 0;
+    parts.push(`DMG ${item.damage[0] + flat}–${item.damage[1] + flat}`);
+    if (b.damage_pct)  parts.push(`+${b.damage_pct}% DMG`);
+    if (b.to_hit_flat) parts.push(`+${b.to_hit_flat}% Hit`);
+  }
+
+  if (item.ac !== undefined) {
+    parts.push(`AC ${item.ac + (b.ac || 0)}`);
+  }
+
+  if (b.str)  parts.push(`+${b.str} STR`);
+  if (b.dex)  parts.push(`+${b.dex} DEX`);
+  if (b.vit)  parts.push(`+${b.vit} VIT`);
+  if (b.life) parts.push(`+${b.life} Life`);
+
+  return parts.join(' · ');
 }

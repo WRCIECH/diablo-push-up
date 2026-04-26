@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --prefix /Users/wojciechrembelski/dev/projects/diablo-push-up/client run build)"
+    ]
+  }
+}

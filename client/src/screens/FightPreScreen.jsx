@@ -361,7 +361,12 @@ export default function FightPreScreen() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
         <button className="btn btn-ghost" style={{ padding: '6px 12px', fontSize: '11px' }}
-                onClick={() => setScreen('dungeon')}>
+                onClick={() => {
+                  // Retreat to parent node so DungeonScreen doesn't auto-redirect back here
+                  const parentId = state.dungeon?.nodes[state.dungeon?.currentNodeId]?.parentId;
+                  if (parentId) dispatchAndSave({ type: 'NAVIGATE_TO_NODE', payload: { nodeId: parentId } });
+                  setScreen('dungeon');
+                }}>
           ← Back
         </button>
         <span className="title-small">Encounter</span>
@@ -446,14 +451,14 @@ export default function FightPreScreen() {
         </div>
       )}
 
-      {/* Start */}
+      {/* Start / Claim Victory */}
       <button
         className="btn btn-primary btn-full"
         style={{ fontSize: '15px', padding: '18px', letterSpacing: '0.08em', flexShrink: 0 }}
         disabled={!fightData}
-        onClick={startFight}
+        onClick={fightData?.finalPushUps.length === 0 ? handleWin : startFight}
       >
-        ⚔  Start Fight
+        {fightData?.finalPushUps.length === 0 ? '✓  Claim Victory — no push-ups required' : '⚔  Start Fight'}
       </button>
     </div>
   );

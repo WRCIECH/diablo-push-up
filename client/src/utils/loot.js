@@ -29,6 +29,7 @@ function buildBasePool(itemsData) {
     ...itemsData.shields,
     ...itemsData.helms,
     ...itemsData.armor,
+    ...itemsData.potions,   // potions can drop from monsters per GDD
   ];
 }
 

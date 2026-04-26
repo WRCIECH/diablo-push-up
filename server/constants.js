@@ -7,10 +7,10 @@ const CONSTANTS = {
   PUSH_UP_RATIO: 0.5,
 
   // Seconds of fight time removed per 1 point of monster Damage (per successful monster hit roll)
-  DAMAGE_TO_SECONDS: 3,
+  DAMAGE_TO_SECONDS: 6,
 
   // Base fight time in seconds before monster damage reductions
-  BASE_FIGHT_TIME: 120,
+  BASE_FIGHT_TIME: 40,
 
   // Seconds added to the vitality buffer per 1 point of player Vitality
   VITALITY_TO_SECONDS: 2,

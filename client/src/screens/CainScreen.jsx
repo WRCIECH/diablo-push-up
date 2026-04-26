@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext.jsx';
-import { resolveItemName, qualityColor } from '../utils/items.js';
+import { resolveItemName, qualityColor, getItemStatLine } from '../utils/items.js';
 import { useMusic } from '../hooks/useMusic.js';
 
 const IDENTIFY_COST = 100;
@@ -61,7 +61,7 @@ export default function CainScreen() {
     }
     dispatchAndSave({ type: 'SPEND_GOLD', payload: IDENTIFY_COST });
     dispatchAndSave({ type: 'IDENTIFY_ITEM', payload: item.uid });
-    setLastIdentified(item);
+    setLastIdentified({ ...item, identified: true }); // store identified copy so stats resolve correctly
     setDialog('identified');
   }
 
@@ -90,11 +90,18 @@ export default function CainScreen() {
             "{DIALOGS[dialog]}"
           </div>
           {lastIdentified && dialog === 'identified' && (
-            <div style={{ marginTop: '8px', padding: '6px 10px', background: 'var(--bg-input)', borderRadius: '2px' }}>
-              <span style={{ color: qualityColor(lastIdentified.quality), fontSize: '12px' }}>
+            <div style={{ marginTop: '8px', padding: '8px 10px', background: 'var(--bg-input)', borderRadius: '2px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              <span style={{ color: qualityColor(lastIdentified.quality), fontSize: '13px', fontWeight: 600 }}>
                 {lastIdentified.magic_name || lastIdentified.name}
               </span>
-              <span className="text-dim" style={{ fontSize: '11px' }}> — revealed</span>
+              <span className="text-dim" style={{ fontSize: '12px' }}>
+                {getItemStatLine(lastIdentified)}
+              </span>
+              {lastIdentified.prefix && (
+                <span style={{ color: 'var(--blue-text)', fontSize: '11px' }}>
+                  {lastIdentified.prefix.name} · {lastIdentified.suffix?.name ?? ''}
+                </span>
+              )}
             </div>
           )}
         </div>

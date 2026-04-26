@@ -21,7 +21,9 @@ export function generateDungeon(levelId, locationsData) {
   const { depth, place_pool, intro_texts } = levelDef;
 
   let counter = 0;
+  let levelPlaced = false;   // only one level-transition per dungeon
   const nodes = {};
+  const nothingEntry = place_pool.find(p => p.type === 'nothing') ?? place_pool[0];
 
   function makeNode(parentId, currentDepth) {
     const id = String(counter++);
@@ -35,7 +37,12 @@ export function generateDungeon(levelId, locationsData) {
         visited: false, defeated: false,
       };
     } else {
-      const place   = weightedPick(place_pool);
+      let place = weightedPick(place_pool);
+      // Enforce a single level-transition node in the whole dungeon
+      if (place.type === 'level') {
+        if (levelPlaced) place = nothingEntry;
+        else levelPlaced = true;
+      }
       const cryptic = Math.random() < (place.cryptic_chance ?? 0.5);
       node = {
         id,
