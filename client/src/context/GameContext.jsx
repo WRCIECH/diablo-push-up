@@ -169,6 +169,11 @@ export function reducer(state, action) {
       };
     }
 
+    case 'DAMAGE_PLAYER': {
+      const newLife = Math.max(1, state.player.stats.life - action.payload);
+      return { ...state, player: { ...state.player, stats: { ...state.player.stats, life: newLife } } };
+    }
+
     case 'HEAL_FULL':
       return { ...state, player: { ...state.player, stats: { ...state.player.stats, life: state.player.stats.maxLife } } };
 

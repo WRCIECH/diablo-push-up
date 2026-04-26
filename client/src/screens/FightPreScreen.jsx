@@ -193,6 +193,14 @@ export default function FightPreScreen() {
 
   function handleWin() {
     clearInterval(intervalId.current);
+
+    // HP damage: each buffer second consumed costs 1 life per VITALITY_TO_SECONDS
+    if (phase === 'active' && timerRef.current.isBuffer) {
+      const bufferUsed = Math.max(0, fightData.vitalityBuffer - timerRef.current.buf);
+      const damage     = Math.floor(bufferUsed / C.VITALITY_TO_SECONDS);
+      if (damage > 0) dispatchAndSave({ type: 'DAMAGE_PLAYER', payload: damage });
+    }
+
     const fightId  = generateUID('fight');
     const totalExp = monsters.reduce((s, m) => s + m.exp, 0);
     const newLevel = calcNewLevel(player, totalExp);
@@ -239,6 +247,10 @@ export default function FightPreScreen() {
   function handleLoss() {
     if (!lostConfirm && !timerDisp.ended) { setLostConfirm(true); return; }
     clearInterval(intervalId.current);
+    // Reduce HP to 20% of max on loss (minimum 1)
+    const targetLife = Math.max(1, Math.floor(player.stats.maxLife * 0.2));
+    const damage     = Math.max(0, player.stats.life - targetLife);
+    if (damage > 0) dispatchAndSave({ type: 'DAMAGE_PLAYER', payload: damage });
     dispatchAndSave({ type: 'SET_PENALTY', payload: new Date(Date.now() + C.PENALTY_MS).toISOString() });
     dispatchAndSave({ type: 'LEAVE_DUNGEON' });
     setScreen('tristram');
