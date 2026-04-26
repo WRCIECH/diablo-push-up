@@ -436,13 +436,13 @@ export default function FightPreScreen() {
             <div className="title-small" style={{ marginBottom: '8px' }}>Combat Calculation</div>
             <div className="divider" style={{ marginBottom: '8px' }} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px' }}>
-              <StatRow label="STR + Weapon"   value={`${player.stats.strength}+${fightData.weaponDamage}`} />
-              <StatRow label="Skip chance"     value={pct(fightData.skipChance)} color="var(--green-text)" />
-              <StatRow label="Player ToHit%"   value={`${fightData.playerToHitPct}%`} />
-              <StatRow label="Monster hit%"    value={pct(fightData.monsterHitChance)} color="var(--red-text)" />
-              <StatRow label="Player AC"       value={fightData.playerAC} />
-              <StatRow label="Time lost"       value={`-${fightData.baseTimeReduction}s`}
-                       color={fightData.baseTimeReduction > 0 ? 'var(--red-text)' : 'var(--text-dim)'} />
+              <StatRow label="Ease chance (STR)" value={pct(fightData.easeChance)}      color="var(--green-text)" />
+              <StatRow label="Ease amount"        value={`−${fightData.easeAmount} diff`} />
+              <StatRow label="Skip chance (DEX)"  value={pct(fightData.skipChance)}      color="var(--green-text)" />
+              <StatRow label="Monster hit%"       value={pct(fightData.monsterHitChance)} color="var(--red-text)" />
+              <StatRow label="Player AC"          value={fightData.playerAC} />
+              <StatRow label="Time lost"          value={`-${fightData.baseTimeReduction}s`}
+                        color={fightData.baseTimeReduction > 0 ? 'var(--red-text)' : 'var(--text-dim)'} />
             </div>
           </div>
         </div>

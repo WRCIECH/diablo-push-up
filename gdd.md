@@ -410,35 +410,39 @@ Wszystkie obliczenia wykonywane są **przed** walką. Gracz widzi upfront:
 
 ### Pętla obliczeniowa — kolejność operacji
 
-Operacje wykonywane są w tej kolejności: najpierw Strength redukuje trudność pompek, dopiero potem Dexterity może je pominąć. Dzięki temu gracz maksymalizuje benefit z siły zanim losowość dexterity wejdzie w grę.
+Operacje wykonywane są w tej kolejności: najpierw Strength (losowo) ułatwia trudność pompek, dopiero potem Dexterity może je całkowicie pominąć. Szansa ułatwienia (Strength) jest celowo wyższa niż szansa pominięcia (Dexterity) — łatwiej wykonać prostszą wersję pompki niż całkowicie jej uniknąć.
 
-**Krok 1 — Pula redukcji siły (deterministyczny)**
+**Krok 1 — Strength ease (losowy, per pompka)**
+
+Każda pompka niezależnie losuje, czy Strength ją ułatwia (zmniejsza difficulty). Szansa jest wyższa niż DEX skip, bo ułatwienie pompki jest bardziej dostępne niż jej całkowite ominięcie.
 
 ```
-reduction_pool = player.Strength + equipped_weapon.damage
+weapon_avg_damage = (weapon.damage_min + weapon.damage_max) / 2
+ease_chance = clamp((40 + Strength/2 + weapon_avg_damage) / 100, 5%, 95%)
+ease_amount = max(1, floor(weapon_avg_damage / 2))   // o ile poziomów difficulty spada
 
-// Generujemy pełną pulę pompek z monster.push_up_types
+// Generujemy pełną pulę pompek
 pula = losuj(monster.push_up_types, round(monster.vitality * PUSH_UP_RATIO))
 
-// Sortujemy od najtrudniejszej i redukujemy difficulty
-FOR EACH pompka w puli [posortowane od max difficulty]:
-  points_to_reduce = pompka.difficulty - 1  // min difficulty = 1 (Knee push-up)
-  actual_reduction = min(points_to_reduce, reduction_pool)
-  pompka.difficulty -= actual_reduction
-  reduction_pool -= actual_reduction
-  IF reduction_pool == 0: STOP
+DLA KAŻDEJ pompki w puli (niezależnie):
+  IF random() < ease_chance:
+    pompka.difficulty = max(1, pompka.difficulty - ease_amount)
+    // pompka mapowana na odpowiedni typ przy nowej trudności
 ```
+
+Przykład: Warrior STR=30, Short Sword (avg 4 dmg) → ease_chance ≈ 59%, ease_amount = 2 poziomy.
+Bez broni: ease_chance ≈ 55%, ease_amount = 1 poziom.
 
 **Krok 2 — Dexterity skip (losowy, per pompka)**
 
 ```
-DLA KAŻDEJ pompki w puli (po redukcji siły):
+DLA KAŻDEJ pompki w puli (po ease z Kroku 1):
 
-  RZUT 1 — Czy pompka jest wymagana?
+  RZUT — Czy pompka jest całkowicie pominięta?
     chance = clamp((player.ToHit% - monster.AC) / 2, 5%, 95%)
     // player.ToHit% = 50 + Dex/2 + clvl
-      → sukces: pompka POMINIĘTA
-      → porażka: pompka WYMAGANA (trafia na finalną listę)
+      → sukces: pompka POMINIĘTA (usunięta z finalnej listy)
+      → porażka: pompka WYMAGANA
 ```
 
 **Krok 3 — Atak potwora (losowy, per pompka z oryginalnej puli)**
@@ -601,11 +605,14 @@ Sloty ekwipunku: `weapon` (1 aktywna broń), `armor` (1 zbroja), `helm` (1 hełm
 Waluta. Wydawana u NPC. Można sprzedawać itemy.
 
 ### Bronie
-Zwiększają `weapon.damage` → wchodzi do puli redukcji siły → obniża difficulty pompek przed walką.
+Zwiększają `weapon.damage` → wpływa na szansę ułatwienia pompek (ease_chance) oraz liczbę poziomów trudności obniżanych gdy ease się powiedzie.
 
-Do puli redukcji liczy się damage **aktywnie wyposażonej broni** (jeden slot broni aktywnej). Warrior startuje z Short Sword w ręku — Club jest w plecaku jako zapasowa i nie liczy się do puli dopóki nie zostanie wyposażona.
+Do kalkulacji liczy się damage **aktywnie wyposażonej broni** (jeden slot broni aktywnej). Warrior startuje z Short Sword w ręku — Club jest w plecaku jako zapasowa i nie liczy się dopóki nie zostanie wyposażona.
 
-`reduction_pool = player.Strength + equipped_weapon.damage`
+```
+ease_chance = clamp((40 + Strength/2 + weapon_avg_damage) / 100, 5%, 95%)
+ease_amount = max(1, floor(weapon_avg_damage / 2))
+```
 
 ### Pancerze
 Zwiększają AC gracza → chronią czas podstawowy (Rzut 3, formuła `MONSTER_HIT_CHANCE`).

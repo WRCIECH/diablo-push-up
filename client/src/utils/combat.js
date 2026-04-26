@@ -70,40 +70,39 @@ export function calculateFight(player, monster, pushUpData) {
   for (let i = 0; i < count; i++) {
     const typeId = pickFromWeightedPool(monster.push_up_types);
     const def    = pushUpData.find(p => p.id === typeId);
-    if (def) rawPool.push({ ...def }); // clone so we don't mutate source
+    if (def) rawPool.push({ ...def });
   }
 
-  // ── Step 1: Strength reduction (deterministic) ────────────────────────────
+  // ── Step 1: Strength ease (probabilistic, per push-up) ───────────────────
+  // Each push-up independently has a chance to have its difficulty reduced.
+  // Ease chance is higher than DEX skip chance — easing is more common than skipping.
+  const weaponAvgDamage = player.equipment.weapon
+    ? (player.equipment.weapon.damage[0] + player.equipment.weapon.damage[1]) / 2
+    : 0;
   const weaponDamage = player.equipment.weapon
     ? rollBetween(player.equipment.weapon.damage[0], player.equipment.weapon.damage[1])
     : 0;
-  const reductionPoolTotal = player.stats.strength + weaponDamage;
-  let reductionPool = reductionPoolTotal;
 
-  // Clone pool for mutation; preserve rawPool for Step 3
-  const reducedPool = rawPool.map(p => ({ ...p }));
+  const easeChance = clamp(
+    (40 + Math.floor(player.stats.strength / 2) + Math.floor(weaponAvgDamage)) / 100,
+    C.HIT_CHANCE_MIN, C.HIT_CHANCE_MAX
+  );
+  const easeAmount = Math.max(1, Math.floor(weaponAvgDamage / 2));
 
-  // Sort indices from hardest to easiest (descending difficulty)
-  const sortedIdx = [...reducedPool.keys()]
-    .sort((a, b) => reducedPool[b].difficulty - reducedPool[a].difficulty);
+  const easedPool = rawPool.map(pu => {
+    if (Math.random() < easeChance) {
+      const newDiff  = Math.max(1, pu.difficulty - easeAmount);
+      const canonical = diffToPushUp(newDiff, pushUpData);
+      return { ...canonical, _originalName: pu.name };
+    }
+    return { ...pu };
+  });
 
-  for (const idx of sortedIdx) {
-    if (reductionPool <= 0) break;
-    const pu      = reducedPool[idx];
-    const canCut  = pu.difficulty - 1; // minimum difficulty = 1
-    const actual  = Math.min(canCut, reductionPool);
-    pu.difficulty    -= actual;
-    reductionPool    -= actual;
-    // Remap to the canonical push-up at the new difficulty level
-    const canonical   = diffToPushUp(pu.difficulty, pushUpData);
-    reducedPool[idx]  = { ...canonical, _originalName: pu.name };
-  }
-
-  // ── Step 2: Dexterity skip (per push-up in reducedPool) ──────────────────
+  // ── Step 2: Dexterity skip (probabilistic, per push-up in easedPool) ─────
   const playerToHitPct = 50 + Math.floor(player.stats.dexterity / 2) + player.level;
   const skipChance     = clamp((playerToHitPct - monster.ac) / 2 / 100,
                                C.HIT_CHANCE_MIN, C.HIT_CHANCE_MAX);
-  const finalPushUps   = reducedPool.filter(() => Math.random() >= skipChance);
+  const finalPushUps   = easedPool.filter(() => Math.random() >= skipChance);
 
   // ── Step 3: Monster attacks against ORIGINAL pool ─────────────────────────
   const playerAC           = Math.floor(player.stats.dexterity / 5) + getArmorAC(player);
@@ -123,13 +122,15 @@ export function calculateFight(player, monster, pushUpData) {
   const vitalityBuffer = player.stats.vitality * C.VITALITY_TO_SECONDS;
 
   return {
-    rawPool,            // original push-ups (for history)
-    reducedPool,        // after strength reduction
-    finalPushUps,       // what player must physically do (after dex skip)
+    rawPool,
+    easedPool,
+    finalPushUps,
     baseTime,
     vitalityBuffer,
     weaponDamage,
-    reductionPoolTotal,
+    weaponAvgDamage,
+    easeChance,
+    easeAmount,
     skipChance,
     playerToHitPct,
     playerAC,

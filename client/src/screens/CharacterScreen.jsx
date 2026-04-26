@@ -317,11 +317,13 @@ function GearPanel({ player, onEquip, onUnequip, onSell, onUse }) {
 function StatsPanel({ player, canAllocate, onAllocate }) {
   const ac    = calcAC(player);
   const toHit = calcToHit(player);
-  const weap  = player.equipment.weapon;
-  const simplify = weap
-    ? `${player.stats.strength + weap.damage[0]}–${player.stats.strength + weap.damage[1]}`
-    : `${player.stats.strength}`;
-  const buffer = player.stats.vitality * C.VITALITY_TO_SECONDS;
+  const weap           = player.equipment.weapon;
+  const weaponAvg      = weap ? (weap.damage[0] + weap.damage[1]) / 2 : 0;
+  const easeChancePct  = Math.round(Math.min(0.95, Math.max(0.05,
+    (40 + Math.floor(player.stats.strength / 2) + Math.floor(weaponAvg)) / 100
+  )) * 100);
+  const easeAmount     = Math.max(1, Math.floor(weaponAvg / 2));
+  const buffer         = player.stats.vitality * C.VITALITY_TO_SECONDS;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -372,8 +374,8 @@ function StatsPanel({ player, canAllocate, onAllocate }) {
         <div className="title-small" style={{ marginBottom: '8px' }}>Combat</div>
         <div className="divider" style={{ marginBottom: '10px' }}/>
         <CombatRow label="Hit Resist"   value={ac}/>
-        <CombatRow label="Skip Chance"  value={`${toHit}%`}/>
-        <CombatRow label="Ease"         value={simplify}/>
+        <CombatRow label="Ease chance"  value={`${easeChancePct}% (−${easeAmount} diff)`}/>
+        <CombatRow label="Skip chance"  value={`${toHit}%`}/>
         <CombatRow label="Time Buffer"  value={`+${buffer}s`}/>
       </div>
     </div>
