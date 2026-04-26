@@ -356,33 +356,6 @@ export default function DungeonMap({ dungeon, onClose, inline, onNavigate, onBac
         </div>
       </div>
 
-      {/* ── Legend ── */}
-      <div style={{
-        padding: '10px 16px', flexShrink: 0,
-        borderTop: '1px solid var(--border-dark)',
-        display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center',
-      }}>
-        {[
-          { fill: '#2a1e06', stroke: '#f0c040',  icon: '●', iconColor: '#f0c040', label: 'You are here' },
-          { fill: '#1e0808', stroke: '#9a2020',  icon: '⚔', iconColor: '#cc3030', label: 'Enemy'        },
-          { fill: '#071407', stroke: '#2a6a2a',  icon: '✓', iconColor: '#2a6a2a', label: 'Cleared'      },
-          { fill: '#141008', stroke: '#8a6a14',  icon: '↓', iconColor: '#c4991e', label: 'Stairs'       },
-          { fill: '#0a0f0a', stroke: '#204020',  icon: '',  iconColor: '',         label: 'Empty room'   },
-          { fill: '#0c0c0a', stroke: '#222220',  icon: '',  iconColor: '',         label: 'Unseen'       },
-        ].map(({ fill, stroke, icon, iconColor, label }) => (
-          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <div style={{
-              width: 14, height: 14, flexShrink: 0, borderRadius: '3px',
-              background: fill, border: `1.5px solid ${stroke}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '8px', color: iconColor, lineHeight: 1,
-            }}>
-              {icon}
-            </div>
-            <span style={{ fontSize: '11px', color: 'var(--text-dim)' }}>{label}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
