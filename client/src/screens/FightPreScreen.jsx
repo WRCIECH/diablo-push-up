@@ -184,13 +184,12 @@ export default function FightPreScreen() {
     setPhase('active');
   }
 
-  function drinkPotion() {
-    const potion = state.player.inventory.find(i => i.type === 'healing');
+  function drinkPotion(healType) {
+    const potion = state.player.inventory.find(i => i.type === 'healing' && i.heal === healType);
     if (!potion) return;
-    const isFull  = potion.heal === 'full';
+    const isFull  = healType === 'full';
     const seconds = isFull ? fightData.vitalityBuffer : C.HEALING_POTION_SECONDS;
     if (timerRef.current.isBuffer) {
-      // Cap buffer at the max allowed by vitality
       timerRef.current.buf = isFull
         ? fightData.vitalityBuffer
         : Math.min(fightData.vitalityBuffer, timerRef.current.buf + seconds);
@@ -285,10 +284,16 @@ export default function FightPreScreen() {
   // ── ACTIVE PHASE ──────────────────────────────────────────────────────────
 
   if (phase === 'active') {
-    const nextPotion  = state.player.inventory.find(i => i.type === 'healing');
-    const potionCount = state.player.inventory.filter(i => i.type === 'healing').length;
-    const potionSecs  = nextPotion?.heal === 'full' ? fightData.vitalityBuffer : C.HEALING_POTION_SECONDS;
-    const aggregated  = aggregatePushUps(fightData.finalPushUps);
+    const aggregated = aggregatePushUps(fightData.finalPushUps);
+    const potionDefs = [
+      { healType: 'partial', secs: C.HEALING_POTION_SECONDS,
+        placeholder: { id: 'healing_potion',      slot: 'potion', heal: 'partial' } },
+      { healType: 'full',    secs: fightData.vitalityBuffer,
+        placeholder: { id: 'full_healing_potion', slot: 'potion', heal: 'full'    } },
+    ].map(def => ({
+      ...def,
+      items: state.player.inventory.filter(i => i.type === 'healing' && i.heal === def.healType),
+    }));
 
     return (
       <div className="screen">
@@ -344,45 +349,52 @@ export default function FightPreScreen() {
 
         {/* Potion + outcome buttons */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
+          {/* Potion row — one slot per type, expandable for future potions */}
           <div style={{ display: 'flex', gap: '8px' }}>
-            {/* Potion icon button */}
-            <div style={{ position: 'relative', flexShrink: 0 }}>
-              <button
-                onClick={drinkPotion}
-                disabled={!nextPotion}
-                style={{
-                  width: 56, height: 56, borderRadius: '4px', cursor: nextPotion ? 'pointer' : 'default',
-                  background: nextPotion ? 'var(--bg-input)' : 'var(--bg-panel)',
-                  border: `1px solid ${nextPotion ? 'var(--border-mid)' : 'var(--border-dark)'}`,
-                  opacity: nextPotion ? 1 : 0.35,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center',
-                  justifyContent: 'center', gap: '2px',
-                }}
-              >
-                <ItemIcon item={nextPotion ?? { id: 'healing_potion', slot: 'potion', heal: 'partial' }} size={34}/>
-                <span style={{ fontSize: '9px', color: 'var(--text-dim)', lineHeight: 1 }}>
-                  +{potionSecs}s
-                </span>
-              </button>
-              {potionCount > 0 && (
-                <div style={{
-                  position: 'absolute', top: -6, right: -6,
-                  background: 'var(--bg-panel)', border: '1px solid var(--border-mid)',
-                  borderRadius: '50%', width: 18, height: 18,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '10px', fontWeight: 700, color: 'var(--text-cream)',
-                }}>
-                  {potionCount}
+            {potionDefs.map(({ healType, secs, placeholder, items }) => {
+              const count    = items.length;
+              const iconItem = items[0] ?? placeholder;
+              return (
+                <div key={healType} style={{ position: 'relative' }}>
+                  <button
+                    onClick={() => drinkPotion(healType)}
+                    disabled={count === 0}
+                    style={{
+                      width: 56, height: 56, borderRadius: '4px',
+                      cursor: count > 0 ? 'pointer' : 'default',
+                      background: count > 0 ? 'var(--bg-input)' : 'var(--bg-panel)',
+                      border: `1px solid ${count > 0 ? 'var(--border-mid)' : 'var(--border-dark)'}`,
+                      opacity: count > 0 ? 1 : 0.35,
+                      display: 'flex', flexDirection: 'column',
+                      alignItems: 'center', justifyContent: 'center', gap: '2px',
+                    }}
+                  >
+                    <ItemIcon item={iconItem} size={34}/>
+                    <span style={{ fontSize: '9px', color: 'var(--text-dim)', lineHeight: 1 }}>
+                      +{secs}s
+                    </span>
+                  </button>
+                  {count > 0 && (
+                    <div style={{
+                      position: 'absolute', top: -6, right: -6,
+                      background: 'var(--bg-panel)', border: '1px solid var(--border-mid)',
+                      borderRadius: '50%', width: 18, height: 18,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '10px', fontWeight: 700, color: 'var(--text-cream)',
+                    }}>
+                      {count}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-
-            <button className="btn btn-primary"
-                    style={{ flex: 1, fontSize: '14px', padding: '15px' }}
-                    onClick={handleWin}>
-              ⚔  I finished all push-ups
-            </button>
+              );
+            })}
           </div>
+
+          <button className="btn btn-primary btn-full"
+                  style={{ fontSize: '14px', padding: '15px' }}
+                  onClick={handleWin}>
+            ⚔  I finished all push-ups
+          </button>
 
           {lostConfirm ? (
             <div style={{ display: 'flex', gap: '8px' }}>
