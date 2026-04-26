@@ -5,6 +5,7 @@
       "name": "Cathedral Level 1",
       "type": "dungeon3",
       "depth": 4,
+      "additional_enemy_probability": 0.35,
       "intro_texts": [
         "You descend into the cathedral crypts. The air reeks of rot and sulfur. Three passages stretch before you into darkness.",
         "Ancient stone groans beneath your boots as the catacombs swallow you whole. Torches flicker in a distant draft. Three corridors await your choice.",

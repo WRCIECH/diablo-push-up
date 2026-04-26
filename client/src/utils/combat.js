@@ -62,20 +62,10 @@ function getArmorAC(player) {
  *  2. Dexterity skip per push-up (probabilistic)
  *  3. Monster hit rolls against original pool → reduce base time (probabilistic)
  */
-export function calculateFight(player, monster, pushUpData) {
+// monsters is always an array (single-monster fights pass a one-element array)
+export function calculateFight(player, monsters, pushUpData) {
 
-  // ── Step 0: Generate raw push-up pool ────────────────────────────────────
-  const count = Math.max(1, Math.round(monster.vitality * C.PUSH_UP_RATIO));
-  const rawPool = [];
-  for (let i = 0; i < count; i++) {
-    const typeId = pickFromWeightedPool(monster.push_up_types);
-    const def    = pushUpData.find(p => p.id === typeId);
-    if (def) rawPool.push({ ...def });
-  }
-
-  // ── Step 1: Strength ease (probabilistic, per push-up) ───────────────────
-  // Each push-up independently has a chance to have its difficulty reduced.
-  // Ease chance is higher than DEX skip chance — easing is more common than skipping.
+  // ── Weapon stats (shared across steps) ───────────────────────────────────
   const weaponAvgDamage = player.equipment.weapon
     ? (player.equipment.weapon.damage[0] + player.equipment.weapon.damage[1]) / 2
     : 0;
@@ -83,6 +73,39 @@ export function calculateFight(player, monster, pushUpData) {
     ? rollBetween(player.equipment.weapon.damage[0], player.equipment.weapon.damage[1])
     : 0;
 
+  // ── Step 0: Generate raw pool from all monsters ───────────────────────────
+  // Each monster contributes its own sub-pool; attacks resolve against that sub-pool only.
+  const playerAC = Math.floor(player.stats.dexterity / 5) + getArmorAC(player);
+  const rawPool  = [];
+  let baseTimeReduction = 0;
+  let hitsOnPlayer      = 0;
+  const monsterStats    = [];
+
+  for (const monster of monsters) {
+    const count      = Math.max(1, Math.round(monster.vitality * C.PUSH_UP_RATIO));
+    const subPool    = [];
+    for (let i = 0; i < count; i++) {
+      const typeId = pickFromWeightedPool(monster.push_up_types);
+      const def    = pushUpData.find(p => p.id === typeId);
+      if (def) subPool.push({ ...def });
+    }
+    rawPool.push(...subPool);
+
+    // ── Step 3 (per monster): attacks against its own sub-pool ───────────
+    const monsterHitChance = clamp((monster.toHit - playerAC) / 2 / 100,
+                                   C.HIT_CHANCE_MIN, C.HIT_CHANCE_MAX);
+    let monsterHits = 0;
+    for (let i = 0; i < subPool.length; i++) {
+      if (Math.random() < monsterHitChance) {
+        baseTimeReduction += rollBetween(monster.damage[0], monster.damage[1]) * C.DAMAGE_TO_SECONDS;
+        hitsOnPlayer++;
+        monsterHits++;
+      }
+    }
+    monsterStats.push({ name: monster.name, hitChance: monsterHitChance, hits: monsterHits });
+  }
+
+  // ── Step 1: Strength ease (probabilistic, per push-up) ───────────────────
   const easeChance = clamp(
     (40 + Math.floor(player.stats.strength / 2) + Math.floor(weaponAvgDamage)) / 100,
     C.HIT_CHANCE_MIN, C.HIT_CHANCE_MAX
@@ -91,7 +114,7 @@ export function calculateFight(player, monster, pushUpData) {
 
   const easedPool = rawPool.map(pu => {
     if (Math.random() < easeChance) {
-      const newDiff  = Math.max(1, pu.difficulty - easeAmount);
+      const newDiff   = Math.max(1, pu.difficulty - easeAmount);
       const canonical = diffToPushUp(newDiff, pushUpData);
       return { ...canonical, _originalName: pu.name };
     }
@@ -99,26 +122,14 @@ export function calculateFight(player, monster, pushUpData) {
   });
 
   // ── Step 2: Dexterity skip (probabilistic, per push-up in easedPool) ─────
+  // Use average monster AC so mixed groups scale the skip chance proportionally.
+  const avgAC          = Math.round(monsters.reduce((s, m) => s + m.ac, 0) / monsters.length);
   const playerToHitPct = 50 + Math.floor(player.stats.dexterity / 2) + player.level;
-  const skipChance     = clamp((playerToHitPct - monster.ac) / 2 / 100,
+  const skipChance     = clamp((playerToHitPct - avgAC) / 2 / 100,
                                C.HIT_CHANCE_MIN, C.HIT_CHANCE_MAX);
   const finalPushUps   = easedPool.filter(() => Math.random() >= skipChance);
 
-  // ── Step 3: Monster attacks against ORIGINAL pool ─────────────────────────
-  const playerAC           = Math.floor(player.stats.dexterity / 5) + getArmorAC(player);
-  const monsterHitChance   = clamp((monster.toHit - playerAC) / 2 / 100,
-                                   C.HIT_CHANCE_MIN, C.HIT_CHANCE_MAX);
-  let baseTimeReduction    = 0;
-  let hitsOnPlayer         = 0;
-
-  for (let i = 0; i < rawPool.length; i++) {
-    if (Math.random() < monsterHitChance) {
-      baseTimeReduction += rollBetween(monster.damage[0], monster.damage[1]) * C.DAMAGE_TO_SECONDS;
-      hitsOnPlayer++;
-    }
-  }
-
-  const baseTime      = Math.max(0, C.BASE_FIGHT_TIME - baseTimeReduction);
+  const baseTime       = Math.max(0, C.BASE_FIGHT_TIME - baseTimeReduction);
   const vitalityBuffer = player.stats.vitality * C.VITALITY_TO_SECONDS;
 
   return {
@@ -134,7 +145,7 @@ export function calculateFight(player, monster, pushUpData) {
     skipChance,
     playerToHitPct,
     playerAC,
-    monsterHitChance,
+    monsterStats,    // array — one entry per monster
     hitsOnPlayer,
     baseTimeReduction,
   };

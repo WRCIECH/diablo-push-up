@@ -44,11 +44,23 @@ export function generateDungeon(levelId, locationsData) {
         else levelPlaced = true;
       }
       const cryptic = Math.random() < (place.cryptic_chance ?? 0.5);
+
+      // For fight nodes, draw additional enemies with decreasing probability
+      const monsters = [];
+      if (place.type === 'fight') {
+        monsters.push(place.monster);
+        const addProb = levelDef.additional_enemy_probability ?? 0;
+        const fightPool = place_pool.filter(p => p.type === 'fight');
+        while (fightPool.length && Math.random() < addProb) {
+          monsters.push(weightedPick(fightPool).monster);
+        }
+      }
+
       node = {
         id,
         depth:       currentDepth,
         type:        place.type,
-        monster:     place.monster      || null,
+        monsters,
         targetLevel: place.target_level || null,
         cryptic,
         parentId,
@@ -85,24 +97,40 @@ export function generateDungeon(levelId, locationsData) {
 
 // ── Description helpers (deterministic by node id) ───────────────────────────
 
+/** Returns the monsters array for a node, handling both new and old save formats. */
+export function getMonsters(node) {
+  if (node.monsters?.length) return node.monsters;
+  if (node.monster) return [node.monster]; // backward compat with old saves
+  return [];
+}
+
 export function getChildDescription(child, levelDef) {
+  const monsters = getMonsters(child);
   if (child.type === 'fight' && child.defeated) {
-    return `Remains of ${child.monster || 'a creature'}. Passage clear.`;
+    const names = monsters.length ? monsters.join(' & ') : 'a creature';
+    return `Remains of ${names}. Passage clear.`;
   }
   if (child.cryptic) {
     const pool = levelDef.descriptions.cryptic[child.type] || ['A passage leads onward.'];
     return pool[parseInt(child.id, 10) % pool.length];
   }
-  if (child.type === 'fight')   return levelDef.descriptions.visible[child.monster]  || 'A creature stirs ahead.';
+  if (child.type === 'fight') {
+    const base = levelDef.descriptions.visible[monsters[0]] || 'A creature stirs ahead.';
+    return monsters.length > 1 ? `${base} Others lurk nearby.` : base;
+  }
   if (child.type === 'nothing') return levelDef.descriptions.visible.nothing;
   if (child.type === 'level')   return levelDef.descriptions.visible.level;
   return 'A passage continues forward.';
 }
 
 export function getArrivalMessage(node) {
-  if (node.type === 'nothing')  return 'Nothing of value here. Your torch casts long shadows on the stone walls.';
-  if (node.type === 'fight' && node.defeated) return `The ${node.monster} has been slain. The chamber falls silent.`;
-  if (node.type === 'level')    return 'Stone steps descend into deeper darkness. The cold rises from below.';
+  if (node.type === 'nothing') return 'Nothing of value here. Your torch casts long shadows on the stone walls.';
+  if (node.type === 'fight' && node.defeated) {
+    const monsters = getMonsters(node);
+    const names = monsters.length > 1 ? `${monsters[0]} and company` : monsters[0];
+    return `${names} ${monsters.length > 1 ? 'have' : 'has'} been slain. The chamber falls silent.`;
+  }
+  if (node.type === 'level') return 'Stone steps descend into deeper darkness. The cold rises from below.';
   return null;
 }
 

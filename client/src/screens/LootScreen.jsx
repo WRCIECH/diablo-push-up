@@ -191,21 +191,54 @@ function CorpsePortrait({ monster }) {
 
 // ── Loot reveal ───────────────────────────────────────────────────────────────
 
-function LootReveal({ loot, gold }) {
-  const hasGold  = gold > 0;
-  const hasItem  = !!loot;
-  const isPotion = loot?.slot === 'potion';
-  const name     = hasItem ? resolveItemName(loot)     : null;
-  const stat     = hasItem ? getItemStatLine(loot)     : null;
-  const color    = hasItem ? qualityColor(loot.quality) : 'var(--text-gold)';
+function LootItemCard({ item, delay }) {
+  const name  = resolveItemName(item);
+  const stat  = getItemStatLine(item);
+  const color = qualityColor(item.quality);
+  return (
+    <div style={{
+      textAlign: 'center', padding: '10px 16px',
+      background: 'rgba(196,153,30,0.07)',
+      border: '1px solid rgba(196,153,30,0.25)', borderRadius: '4px',
+      animation: `loot-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) ${delay}ms both`,
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '6px' }}>
+        <ItemIcon item={item} size={52}/>
+      </div>
+      <div style={{ color, fontSize: '13px', fontWeight: 700 }}>
+        {name}
+        {item.quality === 'unique' && (
+          <span style={{ color: 'var(--text-gold)', fontSize: '10px',
+                         marginLeft: '8px', letterSpacing: '0.1em' }}>UNIQUE</span>
+        )}
+      </div>
+      {stat && <div className="text-dim" style={{ fontSize: '11px', marginTop: '3px' }}>{stat}</div>}
+      <div className="text-dim" style={{ fontSize: '11px', marginTop: '2px', fontStyle: 'italic' }}>
+        Sell: {item.sell_price}g
+      </div>
+      {item.quality !== 'normal' && !item.identified && (
+        <div style={{ marginTop: '6px', fontSize: '11px', color: 'var(--blue-text)' }}>
+          Unidentified — visit Deckard Cain (100g)
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LootReveal({ loots, gold }) {
+  const hasGold = gold > 0;
+  const hasItems = loots.length > 0;
 
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
-      animation: 'loot-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
+      width: '100%',
     }}>
       {hasGold && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '10px',
+          animation: 'loot-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
+        }}>
           <span style={{ fontSize: '28px' }}>🪙</span>
           <span style={{ color: 'var(--text-gold)', fontSize: '28px', fontWeight: 800,
                          fontFamily: 'var(--font-display)', letterSpacing: '0.04em' }}>
@@ -214,38 +247,15 @@ function LootReveal({ loot, gold }) {
         </div>
       )}
 
-      {hasItem && (
-        <div style={{
-          textAlign: 'center', padding: '12px 18px',
-          background: 'rgba(196,153,30,0.07)',
-          border: '1px solid rgba(196,153,30,0.25)', borderRadius: '4px',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
-            <ItemIcon item={loot} size={56}/>
-          </div>
-          <div style={{ color, fontSize: '14px', fontWeight: 700 }}>
-            {name}
-            {loot.quality === 'unique' && (
-              <span style={{ color: 'var(--text-gold)', fontSize: '10px',
-                             marginLeft: '8px', letterSpacing: '0.1em' }}>UNIQUE</span>
-            )}
-          </div>
-          {stat && (
-            <div className="text-dim" style={{ fontSize: '12px', marginTop: '4px' }}>{stat}</div>
-          )}
-          <div className="text-dim" style={{ fontSize: '11px', marginTop: '3px', fontStyle: 'italic' }}>
-            Sell value: {loot.sell_price}g
-          </div>
-          {loot.quality !== 'normal' && !loot.identified && (
-            <div style={{ marginTop: '8px', fontSize: '11px', color: 'var(--blue-text)' }}>
-              Unidentified — visit Deckard Cain (100g)
-            </div>
-          )}
-        </div>
-      )}
+      {loots.map((item, i) => (
+        <LootItemCard key={item.uid} item={item} delay={hasGold ? (i + 1) * 120 : i * 120}/>
+      ))}
 
-      {!hasGold && !hasItem && (
-        <div className="text-dim" style={{ fontSize: '13px', fontStyle: 'italic' }}>
+      {!hasGold && !hasItems && (
+        <div className="text-dim" style={{
+          fontSize: '13px', fontStyle: 'italic',
+          animation: 'loot-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
+        }}>
           Nothing of value.
         </div>
       )}
@@ -259,15 +269,16 @@ export default function LootScreen() {
   const { lootResult, setScreen } = useGame();
   const [opened, setOpened] = useState(false);
 
-  const { gold = 0, exp = 0, newLevel, leveledUp, loot, monster } = lootResult || {};
+  const { gold = 0, exp = 0, newLevel, leveledUp, loots = [], monsters = [] } = lootResult || {};
+  const primaryMonster = monsters[0];
 
   useEffect(() => {
-    if (lootResult) playMonsterDeathSound(monster?.type);
+    if (lootResult) playMonsterDeathSound(primaryMonster?.type);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleCorpseClick() {
     if (opened) return;
-    playLootSound(loot, gold > 0);
+    playLootSound(loots[0] ?? null, gold > 0);
     setOpened(true);
   }
 
@@ -309,10 +320,10 @@ export default function LootScreen() {
         alignItems: 'center', justifyContent: 'center',
         gap: '18px', padding: '20px 16px',
       }}>
-        {monster && (
+        {monsters.length > 0 && (
           <div className="text-dim" style={{ fontSize: '11px', letterSpacing: '0.1em',
                                              textTransform: 'uppercase' }}>
-            {monster.name} defeated
+            {monsters.map(m => m.name).join(' · ')} defeated
           </div>
         )}
 
@@ -320,10 +331,11 @@ export default function LootScreen() {
           onClick={handleCorpseClick}
           style={{
             cursor: opened ? 'default' : 'pointer',
+            display: 'flex', gap: '8px', justifyContent: 'center',
             animation: opened ? 'none' : 'corpse-pulse 2s ease-in-out infinite',
           }}
         >
-          <CorpsePortrait monster={monster} />
+          {monsters.map(m => <CorpsePortrait key={m.name} monster={m}/>)}
         </div>
 
         {!opened ? (
@@ -334,7 +346,7 @@ export default function LootScreen() {
             TAP TO LOOT
           </div>
         ) : (
-          <LootReveal loot={loot} gold={gold} />
+          <LootReveal loots={loots} gold={gold} />
         )}
       </div>
 

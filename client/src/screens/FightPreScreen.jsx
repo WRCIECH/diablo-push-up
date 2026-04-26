@@ -4,15 +4,16 @@ import { useMusic } from '../hooks/useMusic.js';
 import { calculateFight, aggregatePushUps, formatTime, pct, C } from '../utils/combat.js';
 import { rollBetween, generateUID } from '../utils/items.js';
 import { rollLoot } from '../utils/loot.js';
+import { getMonsters } from '../utils/dungeon.js';
 
 // ── Monster portrait (SVG, type-coloured) ─────────────────────────────────────
 
-function MonsterPortrait({ monster }) {
+function MonsterPortrait({ monster, size = 80 }) {
   const pal = monster?.type === 'Animal'
     ? { bg: '#080a08', border: '#1a3010', eye: '#44aa22', body: '#1a3010' }
     : { bg: '#1a0808', border: '#5a1010', eye: '#cc2222', body: '#5a1010' };
   return (
-    <svg viewBox="0 0 96 96" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 96 96" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
       <rect width="96" height="96" fill={pal.bg} rx="4"/>
       <rect x="2" y="2" width="92" height="92" fill="none" stroke={pal.border} strokeWidth="1.5" rx="3"/>
       <ellipse cx="48" cy="36" rx="22" ry="20" fill={pal.body} opacity="0.9"/>
@@ -120,7 +121,10 @@ export default function FightPreScreen() {
   const dungeon  = state.dungeon;
   const node     = dungeon?.nodes[dungeon?.currentNodeId];
   const player   = state.player;
-  const monster  = gameData?.monsters?.find(m => m.name === node?.monster);
+  const monsterNames = node ? getMonsters(node) : [];
+  const monsters = monsterNames
+    .map(name => gameData?.monsters?.find(m => m.name === name))
+    .filter(Boolean);
 
   // ── Phase state: 'pre' | 'active' | 'result' ─────────────────────────────
   const [phase,    setPhase]    = useState('pre');
@@ -135,8 +139,8 @@ export default function FightPreScreen() {
 
   // ── Calculate on mount ────────────────────────────────────────────────────
   useEffect(() => {
-    if (!monster || !gameData?.pushUps) return;
-    const data = calculateFight(player, monster, gameData.pushUps);
+    if (!monsters.length || !gameData?.pushUps) return;
+    const data = calculateFight(player, monsters, gameData.pushUps);
     setFightData(data);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -190,45 +194,44 @@ export default function FightPreScreen() {
   function handleWin() {
     clearInterval(intervalId.current);
     const fightId  = generateUID('fight');
-    const newLevel = calcNewLevel(player, monster.exp);
+    const totalExp = monsters.reduce((s, m) => s + m.exp, 0);
+    const newLevel = calcNewLevel(player, totalExp);
 
-    // Roll loot drop
-    const drop = rollLoot(monster, gameData.items);
-    let goldFromDrop = 0;
-    let lootItem     = null;
-
-    if (drop?.type === 'gold') {
-      goldFromDrop = drop.amount;
-    } else if (drop?.type === 'item') {
-      lootItem = drop.item;
+    // Roll loot per monster
+    let totalGold = 0;
+    const lootItems = [];
+    for (const monster of monsters) {
+      const drop = rollLoot(monster, gameData.items);
+      if (drop?.type === 'gold')      totalGold += drop.amount;
+      else if (drop?.type === 'item') lootItems.push(drop.item);
     }
 
     // Apply game state changes
     dispatchAndSave({ type: 'DEFEAT_MONSTER', payload: node.id });
-    dispatchAndSave({ type: 'GAIN_EXP',       payload: monster.exp });
-    if (goldFromDrop > 0) dispatchAndSave({ type: 'ADD_GOLD', payload: goldFromDrop });
-    if (lootItem)         dispatchAndSave({ type: 'ADD_ITEM', payload: lootItem });
+    dispatchAndSave({ type: 'GAIN_EXP',       payload: totalExp });
+    if (totalGold > 0) dispatchAndSave({ type: 'ADD_GOLD', payload: totalGold });
+    for (const item of lootItems) dispatchAndSave({ type: 'ADD_ITEM', payload: item });
 
     // One history entry per required push-up
+    const monsterLabel = monsters.map(m => m.name).join(', ');
     for (const pu of fightData.finalPushUps) {
       dispatchAndSave({ type: 'ADD_HISTORY', payload: {
         timestamp:    new Date().toISOString(),
         fight_id:     fightId,
         push_up_type: pu.id,
-        monster:      monster.name,
+        monster:      monsterLabel,
         level:        dungeon.levelId,
         fight_result: 'won',
       }});
     }
 
-    // Pass summary to LootScreen and navigate there
     setLootResult({
-      gold:     goldFromDrop,
-      exp:      monster.exp,
+      gold:     totalGold,
+      exp:      totalExp,
       newLevel,
       leveledUp: newLevel > player.level,
-      loot:     lootItem,
-      monster,
+      loots:    lootItems,
+      monsters,
     });
     setScreen('loot');
   }
@@ -243,7 +246,7 @@ export default function FightPreScreen() {
 
   // ── Guards ────────────────────────────────────────────────────────────────
 
-  if (!node || !monster || !gameData) {
+  if (!node || !monsters.length || !gameData) {
     return (
       <div className="loading-screen">
         <div className="loading-sigil" />
@@ -266,11 +269,13 @@ export default function FightPreScreen() {
       <div className="screen">
         {/* Monster label */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-          <MonsterPortrait monster={monster} />
+          {monsters.map(m => (
+            <MonsterPortrait key={m.name} monster={m} size={monsters.length > 1 ? 58 : 80}/>
+          ))}
           <div>
-            <div className="title-medium">{monster.name}</div>
+            <div className="title-medium">{monsters.map(m => m.name).join(' · ')}</div>
             <div className="text-dim" style={{ fontSize: '11px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              {monster.type} · Level {dungeon.levelId}
+              {[...new Set(monsters.map(m => m.type))].join(' & ')} · Level {dungeon.levelId}
             </div>
           </div>
         </div>
@@ -374,20 +379,27 @@ export default function FightPreScreen() {
       </div>
 
       {/* Monster card */}
-      <div className="panel panel-gold" style={{ padding: '14px', display: 'flex',
-                                                  gap: '14px', alignItems: 'center', flexShrink: 0 }}>
-        <MonsterPortrait monster={monster} />
-        <div style={{ flex: 1 }}>
-          <div className="title-medium" style={{ marginBottom: '4px' }}>{monster.name}</div>
-          <div className="text-dim" style={{ fontSize: '11px', letterSpacing: '0.06em',
-                                             textTransform: 'uppercase', marginBottom: '8px' }}>
-            {monster.type} · Level {dungeon.levelId}
-          </div>
-          <div className="divider" style={{ marginBottom: '8px' }} />
-          <div className="text-flavor" style={{ fontSize: '12px', lineHeight: 1.7 }}>
-            {monster.description}
+      <div className="panel panel-gold" style={{ padding: '14px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
+          {monsters.map(m => (
+            <MonsterPortrait key={m.name} monster={m} size={monsters.length > 1 ? 58 : 80}/>
+          ))}
+          <div style={{ flex: 1 }}>
+            <div className="title-medium" style={{ marginBottom: '4px' }}>
+              {monsters.map(m => m.name).join(' · ')}
+            </div>
+            <div className="text-dim" style={{ fontSize: '11px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              {[...new Set(monsters.map(m => m.type))].join(' & ')} · Level {dungeon.levelId}
+            </div>
           </div>
         </div>
+        <div className="divider" style={{ marginBottom: '8px' }} />
+        {monsters.map(m => (
+          <div key={m.name} className="text-flavor" style={{ fontSize: '12px', lineHeight: 1.7, marginBottom: '4px' }}>
+            {monsters.length > 1 && <span style={{ color: 'var(--text-gold)', fontSize: '11px' }}>{m.name}: </span>}
+            {m.description}
+          </div>
+        ))}
       </div>
 
       {/* Fight preview — push-ups + time */}
@@ -436,12 +448,14 @@ export default function FightPreScreen() {
             <div className="title-small" style={{ marginBottom: '8px' }}>Combat Calculation</div>
             <div className="divider" style={{ marginBottom: '8px' }} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px' }}>
-              <StatRow label="Ease chance (STR)" value={pct(fightData.easeChance)}      color="var(--green-text)" />
+              <StatRow label="Ease chance (STR)" value={pct(fightData.easeChance)}       color="var(--green-text)" />
               <StatRow label="Ease amount"        value={`−${fightData.easeAmount} diff`} />
-              <StatRow label="Skip chance (DEX)"  value={pct(fightData.skipChance)}      color="var(--green-text)" />
-              <StatRow label="Monster hit%"       value={pct(fightData.monsterHitChance)} color="var(--red-text)" />
-              <StatRow label="Player AC"          value={fightData.playerAC} />
-              <StatRow label="Time lost"          value={`-${fightData.baseTimeReduction}s`}
+              <StatRow label="Skip chance (DEX)"  value={pct(fightData.skipChance)}       color="var(--green-text)" />
+              {fightData.monsterStats.map(ms => (
+                <StatRow key={ms.name} label={`${ms.name} hit%`} value={pct(ms.hitChance)} color="var(--red-text)" />
+              ))}
+              <StatRow label="Player AC"  value={fightData.playerAC} />
+              <StatRow label="Time lost"  value={`-${fightData.baseTimeReduction}s`}
                         color={fightData.baseTimeReduction > 0 ? 'var(--red-text)' : 'var(--text-dim)'} />
             </div>
           </div>
