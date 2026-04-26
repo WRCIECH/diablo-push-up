@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 import { resolveItemName, qualityColor, getItemStatLine } from '../utils/items.js';
 import ItemIcon from '../components/ItemIcon.jsx';
@@ -95,6 +95,60 @@ function playLootSound(loot, hasGold) {
       g.gain.setValueAtTime(0.18, ctx.currentTime);
       g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
       osc.start(); osc.stop(ctx.currentTime + 0.35);
+    }
+  } catch (_) { /* audio unavailable */ }
+}
+
+function playMonsterDeathSound(monsterType) {
+  try {
+    const ctx      = new (window.AudioContext || window.webkitAudioContext)();
+    const isAnimal = monsterType === 'Animal';
+
+    // Impact thud — body hitting ground
+    const thud  = ctx.createOscillator();
+    const thudG = ctx.createGain();
+    thud.connect(thudG); thudG.connect(ctx.destination);
+    thud.type = 'square';
+    thud.frequency.setValueAtTime(90, ctx.currentTime);
+    thud.frequency.exponentialRampToValueAtTime(18, ctx.currentTime + 0.18);
+    thudG.gain.setValueAtTime(0.45, ctx.currentTime);
+    thudG.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+    thud.start(ctx.currentTime);
+    thud.stop(ctx.currentTime + 0.22);
+
+    // Dying groan — animal: warm sawtooth growl; undead: eerie sine wail
+    const groan  = ctx.createOscillator();
+    const groanG = ctx.createGain();
+    groan.connect(groanG); groanG.connect(ctx.destination);
+    groan.type = isAnimal ? 'sawtooth' : 'sine';
+
+    if (isAnimal) {
+      groan.frequency.setValueAtTime(200, ctx.currentTime + 0.04);
+      groan.frequency.exponentialRampToValueAtTime(45, ctx.currentTime + 0.65);
+      groanG.gain.setValueAtTime(0, ctx.currentTime);
+      groanG.gain.linearRampToValueAtTime(0.28, ctx.currentTime + 0.08);
+      groanG.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+      groan.start(ctx.currentTime); groan.stop(ctx.currentTime + 0.7);
+    } else {
+      groan.frequency.setValueAtTime(280, ctx.currentTime + 0.04);
+      groan.frequency.setValueAtTime(240, ctx.currentTime + 0.2);
+      groan.frequency.exponentialRampToValueAtTime(38, ctx.currentTime + 0.95);
+      groanG.gain.setValueAtTime(0, ctx.currentTime);
+      groanG.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 0.08);
+      groanG.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.0);
+      groan.start(ctx.currentTime); groan.stop(ctx.currentTime + 1.0);
+
+      // Ghostly upper harmonic for undead
+      const ghost  = ctx.createOscillator();
+      const ghostG = ctx.createGain();
+      ghost.connect(ghostG); ghostG.connect(ctx.destination);
+      ghost.type = 'triangle';
+      ghost.frequency.setValueAtTime(560, ctx.currentTime + 0.04);
+      ghost.frequency.exponentialRampToValueAtTime(75, ctx.currentTime + 0.85);
+      ghostG.gain.setValueAtTime(0, ctx.currentTime);
+      ghostG.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.1);
+      ghostG.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.9);
+      ghost.start(ctx.currentTime); ghost.stop(ctx.currentTime + 0.9);
     }
   } catch (_) { /* audio unavailable */ }
 }
@@ -206,6 +260,10 @@ export default function LootScreen() {
   const [opened, setOpened] = useState(false);
 
   const { gold = 0, exp = 0, newLevel, leveledUp, loot, monster } = lootResult || {};
+
+  useEffect(() => {
+    if (lootResult) playMonsterDeathSound(monster?.type);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleCorpseClick() {
     if (opened) return;
