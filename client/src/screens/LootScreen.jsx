@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 import { resolveItemName, qualityColor, getItemStatLine } from '../utils/items.js';
+import ItemIcon from '../components/ItemIcon.jsx';
 
 // ── CSS animations ────────────────────────────────────────────────────────────
 
@@ -165,8 +166,8 @@ function LootReveal({ loot, gold }) {
           background: 'rgba(196,153,30,0.07)',
           border: '1px solid rgba(196,153,30,0.25)', borderRadius: '4px',
         }}>
-          <div style={{ fontSize: isPotion ? '30px' : '20px', marginBottom: '6px' }}>
-            {isPotion ? '🧪' : '⚔'}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+            <ItemIcon item={loot} size={56}/>
           </div>
           <div style={{ color, fontSize: '14px', fontWeight: 700 }}>
             {name}

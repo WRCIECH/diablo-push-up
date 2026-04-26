@@ -139,6 +139,36 @@ export function reducer(state, action) {
       return { ...state, player: { ...state.player, inventory: inv } };
     }
 
+    case 'UNEQUIP_SLOT': {
+      const slot = action.payload;
+      const item = state.player.equipment[slot];
+      if (!item) return state;
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          equipment: { ...state.player.equipment, [slot]: null },
+          inventory: [...state.player.inventory, { ...item, uid: `inv_${Date.now()}` }],
+        },
+      };
+    }
+
+    case 'USE_POTION': {
+      const potion = state.player.inventory.find(i => i.uid === action.payload);
+      if (!potion) return state;
+      const heal = potion.heal === 'full'
+        ? state.player.stats.maxLife
+        : Math.ceil(state.player.stats.maxLife / 2);
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          inventory: state.player.inventory.filter(i => i.uid !== action.payload),
+          stats: { ...state.player.stats, life: Math.min(state.player.stats.maxLife, state.player.stats.life + heal) },
+        },
+      };
+    }
+
     case 'HEAL_FULL':
       return { ...state, player: { ...state.player, stats: { ...state.player.stats, life: state.player.stats.maxLife } } };
 
