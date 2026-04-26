@@ -185,9 +185,14 @@ export default function FightPreScreen() {
 
   function drinkPotion() {
     const potion = state.player.inventory.find(i => i.type === 'healing');
-    if (!potion || timerRef.current.isBuffer) return;
-    timerRef.current.main += C.HEALING_POTION_SECONDS;
-    setTimerDisp(d => ({ ...d, seconds: timerRef.current.main }));
+    if (!potion) return;
+    if (timerRef.current.isBuffer) {
+      timerRef.current.buf += C.HEALING_POTION_SECONDS;
+      setTimerDisp(d => ({ ...d, seconds: timerRef.current.buf }));
+    } else {
+      timerRef.current.main += C.HEALING_POTION_SECONDS;
+      setTimerDisp(d => ({ ...d, seconds: timerRef.current.main }));
+    }
     dispatchAndSave({ type: 'REMOVE_ITEM', payload: potion.uid });
   }
 
@@ -333,8 +338,8 @@ export default function FightPreScreen() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
           <button
             className="btn btn-ghost btn-full"
-            style={{ fontSize: '12px', opacity: potionCount > 0 && !timerDisp.isBuffer ? 1 : 0.4 }}
-            disabled={potionCount === 0 || timerDisp.isBuffer}
+            style={{ fontSize: '12px', opacity: potionCount > 0 ? 1 : 0.4 }}
+            disabled={potionCount === 0}
             onClick={drinkPotion}
           >
             🧪 Drank Healing Potion (+{C.HEALING_POTION_SECONDS}s)
