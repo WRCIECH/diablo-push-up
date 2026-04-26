@@ -1,16 +1,24 @@
-// ── Combat constants (mirrors server/constants.js) ────────────────────────────
-// Tune during playtests. See GDD "Stałe wymagające kalibracji".
+// ── Combat constants — loaded from server/constants.js via /api/data/constants ─
+// Edit server/constants.js to tune; the client picks up the values on load.
+// Fallback defaults here are only used if the API call fails.
 
 export const C = {
-  PUSH_UP_RATIO:         0.5,   // monster.vitality × this = push-up count
-  DAMAGE_TO_SECONDS:     3,     // seconds removed per 1 monster damage point (on hit)
-  BASE_FIGHT_TIME:       120,   // base seconds before reductions
-  VITALITY_TO_SECONDS:   2,     // player.vitality × this = buffer seconds
-  HEALING_POTION_SECONDS:30,    // seconds added per potion drunk in fight
-  HIT_CHANCE_MIN:        0.05,  // lower clamp for all hit-chance rolls
-  HIT_CHANCE_MAX:        0.95,  // upper clamp
-  PENALTY_MS:            2 * 60 * 60 * 1000, // 2 h in ms
+  PUSH_UP_RATIO:         0.5,
+  DAMAGE_TO_SECONDS:     3,
+  BASE_FIGHT_TIME:       120,
+  VITALITY_TO_SECONDS:   2,
+  HEALING_POTION_SECONDS:30,
+  HIT_CHANCE_MIN:        0.05,
+  HIT_CHANCE_MAX:        0.95,
+  PENALTY_MS:            2 * 60 * 60 * 1000,
 };
+
+// Called by GameContext after fetching /api/data/constants from the server.
+export function initConstants(serverC) {
+  Object.assign(C, serverC);
+  // Server uses PENALTY_DURATION_MS; client uses PENALTY_MS
+  if (serverC.PENALTY_DURATION_MS !== undefined) C.PENALTY_MS = serverC.PENALTY_DURATION_MS;
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

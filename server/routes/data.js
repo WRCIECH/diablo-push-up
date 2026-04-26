@@ -4,6 +4,10 @@ const router = express.Router();
 
 const ALLOWED = ['items', 'monsters', 'push_ups', 'locations'];
 
+router.get('/constants', (_req, res) => {
+  res.json(require('../constants'));
+});
+
 router.get('/:name', (req, res) => {
   const { name } = req.params;
   if (!ALLOWED.includes(name)) return res.status(404).json({ error: 'Not found' });

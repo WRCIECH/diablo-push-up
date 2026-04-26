@@ -315,9 +315,14 @@ export default function DungeonMap({ dungeon, onClose, inline, onNavigate, onBac
                   {/* Room square */}
                   <rect x={rx} y={ry} width={ROOM} height={ROOM} rx="2"
                         fill={fill} stroke={stroke} strokeWidth={sw}/>
-                  {/* Red dot = enemy present (dim when unvisited but adjacent, bright when visited) */}
+                  {/* Red dot = enemy present */}
                   {node.type === 'fight' && !node.defeated && vis !== 'hidden' && (
                     <circle cx={rx + ROOM/2} cy={ry + ROOM/2} r="1.8" fill="#cc2222"
+                            opacity={vis === 'dim' ? 0.55 : 1}/>
+                  )}
+                  {/* Yellow dot = empty unvisited room */}
+                  {node.type === 'nothing' && !node.visited && vis !== 'hidden' && (
+                    <circle cx={rx + ROOM/2} cy={ry + ROOM/2} r="1.8" fill="#c4991e"
                             opacity={vis === 'dim' ? 0.55 : 1}/>
                   )}
                   {/* Stairs glyph */}
@@ -353,6 +358,7 @@ export default function DungeonMap({ dungeon, onClose, inline, onNavigate, onBac
           { color: '#f0c040', border: '#f0c040', label: 'You are here', dot: null },
           { color: '#071407', border: '#2a7a2a', label: 'Visited',       dot: null },
           { color: '#071407', border: '#2a7a2a', label: 'Enemy inside',  dot: '#cc2222' },
+          { color: '#071407', border: '#2a7a2a', label: 'Empty room',    dot: '#c4991e' },
           { color: '#141008', border: '#7a5a10', label: 'Stairs ↓',      dot: null },
           { color: '#0c0906', border: '#201812', label: 'Unseen',        dot: null },
         ].map(({ color, border, label, dot }) => (

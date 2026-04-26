@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef, useState } from 'react';
 import { loadState, saveState, loadGameData } from '../api.js';
 import { generateShopInventory } from '../utils/items.js';
+import { initConstants } from '../utils/combat.js';
 
 // ── Class templates ──────────────────────────────────────────────────────────
 
@@ -192,8 +193,10 @@ export function GameProvider({ children }) {
       loadGameData('monsters'),
       loadGameData('push_ups'),
       loadGameData('locations'),
+      loadGameData('constants'),
     ])
-      .then(([stateResult, items, monsters, pushUps, locations]) => {
+      .then(([stateResult, items, monsters, pushUps, locations, constants]) => {
+        initConstants(constants);
         setGameData({ items, monsters, pushUps, locations });
         initializedRef.current = true;
         if (stateResult.exists && stateResult.state?.player) {
