@@ -5,7 +5,7 @@ server/data/gamestate.json
 .env
 .DS_Store
 *.log
-# Audio assets — copyrighted, not tracked in git. Add files manually after cloning.
-client/public/audio/*.mp3
-client/public/audio/*.ogg
-client/public/audio/*.wav
+# Audio assets (uncomment if you don't own the rights)
+# client/public/audio/*.mp3
+# client/public/audio/*.ogg
+# client/public/audio/*.wav
