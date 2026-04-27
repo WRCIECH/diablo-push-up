@@ -117,7 +117,8 @@ function collectBonuses(item) {
 }
 
 export function getItemStatLine(item) {
-  if (item.type === 'healing') return '+30s in fight';
+  if (item.type === 'healing')
+    return item.heal === 'full' ? 'Restores full vitality buffer' : '+30s fight time';
 
   const b = collectBonuses(item);
   const parts = [];
