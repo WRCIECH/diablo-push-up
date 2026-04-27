@@ -186,18 +186,12 @@ export default function FightPreScreen() {
 
   function drinkPotion(healType) {
     const potion = state.player.inventory.find(i => i.type === 'healing' && i.heal === healType);
-    if (!potion) return;
-    const isFull  = healType === 'full';
-    const seconds = isFull ? fightData.vitalityBuffer : C.HEALING_POTION_SECONDS;
-    if (timerRef.current.isBuffer) {
-      timerRef.current.buf = isFull
-        ? fightData.vitalityBuffer
-        : Math.min(fightData.vitalityBuffer, timerRef.current.buf + seconds);
-      setTimerDisp(d => ({ ...d, seconds: timerRef.current.buf }));
-    } else {
-      timerRef.current.main += seconds;
-      setTimerDisp(d => ({ ...d, seconds: timerRef.current.main }));
-    }
+    if (!potion || !timerRef.current.isBuffer) return;
+    const isFull = healType === 'full';
+    timerRef.current.buf = isFull
+      ? fightData.vitalityBuffer
+      : Math.min(fightData.vitalityBuffer, timerRef.current.buf + C.HEALING_POTION_SECONDS);
+    setTimerDisp(d => ({ ...d, seconds: timerRef.current.buf }));
     dispatchAndSave({ type: 'REMOVE_ITEM', payload: potion.uid });
   }
 
@@ -358,13 +352,13 @@ export default function FightPreScreen() {
                 <div key={healType} style={{ position: 'relative' }}>
                   <button
                     onClick={() => drinkPotion(healType)}
-                    disabled={count === 0}
+                    disabled={count === 0 || !timerDisp.isBuffer}
                     style={{
                       width: 56, height: 56, borderRadius: '4px',
-                      cursor: count > 0 ? 'pointer' : 'default',
+                      cursor: count > 0 && timerDisp.isBuffer ? 'pointer' : 'default',
                       background: count > 0 ? 'var(--bg-input)' : 'var(--bg-panel)',
                       border: `1px solid ${count > 0 ? 'var(--border-mid)' : 'var(--border-dark)'}`,
-                      opacity: count > 0 ? 1 : 0.35,
+                      opacity: count > 0 && timerDisp.isBuffer ? 1 : 0.35,
                       display: 'flex', flexDirection: 'column',
                       alignItems: 'center', justifyContent: 'center', gap: '2px',
                     }}
