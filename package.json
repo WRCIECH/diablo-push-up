@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Push-up training gamified with Diablo 1 theme",
   "scripts": {
+    "generate-icons": "node scripts/generate-icons.mjs",
     "build": "npm --prefix client install && npm --prefix client run build",
     "start": "node server/index.js",
     "dev": "concurrently \"nodemon server/index.js\" \"npm --prefix client run dev\"",
@@ -14,7 +15,8 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.0.2",
+    "sharp": "^0.33.5"
   },
   "engines": {
     "node": ">=18.0.0"
