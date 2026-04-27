@@ -251,11 +251,8 @@ export default function FightPreScreen() {
   function handleLoss() {
     if (!lostConfirm && !timerDisp.ended) { setLostConfirm(true); return; }
     clearInterval(intervalId.current);
-    // Reduce HP to 20% of max on loss (minimum 1)
-    const targetLife = Math.max(1, Math.floor(player.stats.maxLife * 0.2));
-    const damage     = Math.max(0, player.stats.life - targetLife);
-    if (damage > 0) dispatchAndSave({ type: 'DAMAGE_PLAYER', payload: damage });
     dispatchAndSave({ type: 'SET_PENALTY', payload: new Date(Date.now() + C.PENALTY_MS).toISOString() });
+    dispatchAndSave({ type: 'HEAL_FULL' });
     dispatchAndSave({ type: 'LEAVE_DUNGEON' });
     setScreen('tristram');
   }
