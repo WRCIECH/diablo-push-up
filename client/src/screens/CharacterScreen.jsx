@@ -279,6 +279,10 @@ function GearPanel({ player, onEquip, onUnequip, onSell, onUse, onIdentify, inDu
               · {inv.length} item{inv.length !== 1 ? 's' : ''}
             </span>
           </span>
+          <span style={{ fontSize: '13px' }}>
+            <span className="text-dim" style={{ fontSize: '11px' }}>Gold: </span>
+            <span className="text-gold" style={{ fontWeight: 700 }}>{player.gold}</span>
+          </span>
           {totalPages > 1 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <button className="btn btn-ghost" style={{ padding: '3px 10px', fontSize: '14px' }}
