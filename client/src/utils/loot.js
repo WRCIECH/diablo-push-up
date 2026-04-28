@@ -29,7 +29,16 @@ function buildBasePool(itemsData) {
     ...itemsData.shields,
     ...itemsData.helms,
     ...itemsData.armor,
-    ...itemsData.potions,   // potions can drop from monsters per GDD
+    ...itemsData.potions,
+  ];
+}
+
+function buildEquipmentPool(itemsData) {
+  return [
+    ...itemsData.weapons,
+    ...itemsData.shields,
+    ...itemsData.helms,
+    ...itemsData.armor,
   ];
 }
 
@@ -49,10 +58,8 @@ export function rollLoot(monster, itemsData) {
     };
   }
 
-  const basePool = buildBasePool(itemsData);
-  const base     = pickRandom(basePool);
-
   if (result === 'normal') {
+    const base = pickRandom(buildBasePool(itemsData));
     return {
       type: 'item',
       item: { ...base, uid: generateUID('loot'), quality: 'normal', identified: true },
@@ -60,6 +67,7 @@ export function rollLoot(monster, itemsData) {
   }
 
   if (result === 'magic') {
+    const base       = pickRandom(buildEquipmentPool(itemsData));
     const affixKey   = base.slot === 'weapon' ? 'weapon' : 'armor';
     const availPre   = itemsData.prefixes[affixKey] || [];
     const availSuf   = itemsData.suffixes[affixKey] || [];
@@ -74,8 +82,8 @@ export function rollLoot(monster, itemsData) {
   }
 
   if (result === 'unique') {
-    // Phase 5: uniques are rare magic items with both affixes forced
-    const affixKey = base.slot === 'weapon' ? 'weapon' : 'armor';
+    const base      = pickRandom(buildEquipmentPool(itemsData));
+    const affixKey  = base.slot === 'weapon' ? 'weapon' : 'armor';
     const availPre = itemsData.prefixes[affixKey] || [];
     const availSuf = itemsData.suffixes[affixKey] || [];
     const prefix   = availPre.length ? pickRandom(availPre) : null;
