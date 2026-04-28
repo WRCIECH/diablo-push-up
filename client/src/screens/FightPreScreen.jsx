@@ -430,34 +430,37 @@ export default function FightPreScreen() {
         <span className="title-small">Encounter</span>
       </div>
 
-      {/* Monster card */}
-      <div className="panel panel-gold" style={{ padding: '14px', flexShrink: 0 }}>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
-          {monsters.map(m => (
-            <MonsterPortrait key={m.name} monster={m} size={monsters.length > 1 ? 58 : 80}/>
-          ))}
-          <div style={{ flex: 1 }}>
-            <div className="title-medium" style={{ marginBottom: '4px' }}>
-              {monsters.map(m => m.name).join(' · ')}
-            </div>
-            <div className="text-dim" style={{ fontSize: '11px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              {[...new Set(monsters.map(m => m.type))].join(' & ')} · Level {dungeon.levelId}
-            </div>
-          </div>
-        </div>
-        <div className="divider" style={{ marginBottom: '8px' }} />
-        {monsters.map(m => (
-          <div key={m.name} className="text-flavor" style={{ fontSize: '12px', lineHeight: 1.7, marginBottom: '4px' }}>
-            {monsters.length > 1 && <span style={{ color: 'var(--text-gold)', fontSize: '11px' }}>{m.name}: </span>}
-            {m.description}
-          </div>
-        ))}
-      </div>
+      {/* Scrollable body — monster card + fight preview — button stays pinned below */}
+      <div className="scrollable" style={{ flex: 1, overflowY: 'auto', display: 'flex',
+                                           flexDirection: 'column', gap: '8px' }}>
 
-      {/* Fight preview — push-ups + time */}
-      {fightData ? (
-        <div className="scrollable" style={{ flex: 1, overflowY: 'auto', display: 'flex',
-                                             flexDirection: 'column', gap: '8px' }}>
+        {/* Monster card */}
+        <div className="panel panel-gold" style={{ padding: '14px', flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
+            {monsters.map(m => (
+              <MonsterPortrait key={m.name} monster={m} size={monsters.length > 1 ? 58 : 80}/>
+            ))}
+            <div style={{ flex: 1 }}>
+              <div className="title-medium" style={{ marginBottom: '4px' }}>
+                {monsters.map(m => m.name).join(' · ')}
+              </div>
+              <div className="text-dim" style={{ fontSize: '11px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                {[...new Set(monsters.map(m => m.type))].join(' & ')} · Level {dungeon.levelId}
+              </div>
+            </div>
+          </div>
+          <div className="divider" style={{ marginBottom: '8px' }} />
+          {monsters.map(m => (
+            <div key={m.name} className="text-flavor" style={{ fontSize: '12px', lineHeight: 1.7, marginBottom: '4px' }}>
+              {monsters.length > 1 && <span style={{ color: 'var(--text-gold)', fontSize: '11px' }}>{m.name}: </span>}
+              {m.description}
+            </div>
+          ))}
+        </div>
+
+        {/* Fight preview — push-ups + time */}
+        {fightData ? (
+          <>
 
           {/* Time overview */}
           <div className="panel" style={{ padding: '12px' }}>
@@ -511,12 +514,12 @@ export default function FightPreScreen() {
                         color={fightData.baseTimeReduction > 0 ? 'var(--red-text)' : 'var(--text-dim)'} />
             </div>
           </div>
-        </div>
-      ) : (
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="loading-sigil" />
-        </div>
-      )}
+        </> ) : (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="loading-sigil" />
+          </div>
+        )}
+      </div>
 
       {/* Start / Claim Victory */}
       <button
