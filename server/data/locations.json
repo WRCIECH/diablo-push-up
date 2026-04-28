@@ -16,10 +16,11 @@
       "place_pool": [
         { "type": "fight", "monster": "Zombie",              "weight": 12, "cryptic_chance": 0.4 },
         { "type": "fight", "monster": "Ghoul",               "weight": 6,  "cryptic_chance": 0.5 },
-        { "type": "fight", "monster": "Fallen One (spear)",  "weight": 12, "cryptic_chance": 0.3 },
+        { "type": "fight", "monster": "Fallen One (spear)",  "weight": 10, "cryptic_chance": 0.3 },
         { "type": "fight", "monster": "Fallen One (sword)",  "weight": 8,  "cryptic_chance": 0.3 },
-        { "type": "fight", "monster": "Skeleton",            "weight": 15, "cryptic_chance": 0.5 },
-        { "type": "nothing",                                  "weight": 27, "cryptic_chance": 0.65 },
+        { "type": "fight", "monster": "Skeleton",            "weight": 12, "cryptic_chance": 0.5 },
+        { "type": "fight", "monster": "Scavenger",           "weight": 6,  "cryptic_chance": 0.4 },
+        { "type": "nothing",                                  "weight": 26, "cryptic_chance": 0.65 },
         { "type": "level",  "target_level": 2,               "weight": 20, "cryptic_chance": 0.3 }
       ],
       "descriptions": {
@@ -48,13 +49,14 @@
           ]
         },
         "visible": {
-          "Zombie":              "A shambling undead corpse blocks the path ahead.",
-          "Ghoul":               "A hunched ghoul prowls the corridor, seeking flesh.",
-          "Fallen One (spear)":  "A frenzied Fallen One brandishes a rusted spear.",
-          "Fallen One (sword)":  "A Fallen One clutches a chipped sword, shrieking curses.",
-          "Skeleton":            "An animated skeleton guards the passage with hollow eyes.",
-          "nothing":             "The path ahead appears clear — for now.",
-          "level":               "Stairs descend deeper into the cathedral's bowels."
+          "Zombie":             "A shambling undead corpse blocks the path ahead.",
+          "Ghoul":              "A hunched ghoul prowls the corridor, seeking flesh.",
+          "Fallen One (spear)": "A frenzied Fallen One brandishes a rusted spear.",
+          "Fallen One (sword)": "A Fallen One clutches a chipped sword, shrieking curses.",
+          "Skeleton":           "An animated skeleton guards the passage with hollow eyes.",
+          "Scavenger":          "A four-legged carrion beast crouches in the darkness ahead.",
+          "nothing":            "The path ahead appears clear — for now.",
+          "level":              "Stairs descend deeper into the cathedral's bowels."
         }
       }
     }

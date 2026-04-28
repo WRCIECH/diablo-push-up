@@ -1,62 +1,226 @@
 [
   {
+    "id": "wall",
+    "name": "Wall Push-up",
+    "difficulty": 1,
+    "category": "upper_chest_shoulders",
+    "definition": "Stand facing a wall, hands placed on it at chest height. Lower chest toward the wall, elbows bend. Full arm extension at top. Body in a straight line. The more upright you stand, the easier it is."
+  },
+  {
     "id": "knee",
     "name": "Knee Push-up",
     "difficulty": 1,
+    "category": "chest",
     "definition": "Knees on floor, straight line from knees to shoulders. Lower chest close to floor, full arm extension at top. Hips do not sag."
   },
   {
-    "id": "incline",
-    "name": "Incline Push-up",
+    "id": "incline_high",
+    "name": "Incline Push-up (High)",
     "difficulty": 2,
-    "definition": "Hands on an elevated surface (bench, chair, wall). Straight body line from head to feet. Lower chest to the edge, full arm extension at top."
+    "category": "upper_chest_shoulders",
+    "definition": "Hands on a high elevated surface (table, countertop ~70–90 cm). Straight body line from head to feet. Lower chest to the edge, full arm extension at top."
+  },
+  {
+    "id": "incline_low",
+    "name": "Incline Push-up (Low)",
+    "difficulty": 3,
+    "category": "upper_chest_shoulders",
+    "definition": "Hands on a low elevated surface (bench, chair ~40–50 cm). Straight body line from head to feet. Lower chest to the edge, full arm extension at top. Harder than high incline due to greater angle."
   },
   {
     "id": "standard",
     "name": "Standard Push-up",
     "difficulty": 3,
+    "category": "chest",
     "definition": "Full plank, hands shoulder-width apart. Chest touches the floor, elbows at 45–90 degrees. Full arm extension at top. Hips level throughout."
+  },
+  {
+    "id": "parallette_standard",
+    "name": "Parallette Standard Push-up",
+    "difficulty": 4,
+    "category": "chest",
+    "definition": "Same as standard push-up but hands grip parallette handles. Chest descends below the level of the hands — deeper range of motion. Full arm extension at top."
   },
   {
     "id": "wide",
     "name": "Wide Push-up",
     "difficulty": 4,
+    "category": "chest",
     "definition": "Hands wider than shoulder width. Chest touches the floor. Full arm extension at top."
   },
   {
-    "id": "decline",
-    "name": "Decline Push-up",
+    "id": "decline_low",
+    "name": "Decline Push-up (Low)",
+    "difficulty": 4,
+    "category": "lower_chest",
+    "definition": "Feet elevated on a low surface (~40–50 cm). Straight body line. Chest near the floor, full arm extension at top. Emphasises lower pectorals."
+  },
+  {
+    "id": "parallette_wide",
+    "name": "Parallette Wide Push-up",
     "difficulty": 5,
-    "definition": "Feet elevated on a surface. Straight body line. Lower chest near the floor, full arm extension. Difficulty increases with higher foot elevation."
+    "category": "chest",
+    "definition": "Same as wide push-up but hands grip parallette handles placed wide apart. Chest descends below the level of the hands. Full arm extension at top."
   },
   {
     "id": "close_grip",
     "name": "Close-Grip Push-up",
     "difficulty": 5,
+    "category": "triceps",
     "definition": "Hands placed under the sternum, elbows stay close to the body throughout. Lower chest to hands, full arm extension."
+  },
+  {
+    "id": "decline",
+    "name": "Decline Push-up",
+    "difficulty": 5,
+    "category": "lower_chest",
+    "definition": "Feet elevated on a surface. Straight body line. Lower chest near the floor, full arm extension. Difficulty increases with higher foot elevation."
+  },
+  {
+    "id": "pike",
+    "name": "Pike Push-up",
+    "difficulty": 5,
+    "category": "core_stability",
+    "definition": "Inverted V position — hips raised high, body forms a triangle with the floor. Lower head toward the floor between hands. Full arm extension at top. Transition movement between chest and shoulder push-ups."
+  },
+  {
+    "id": "parallette_close_grip",
+    "name": "Parallette Close-Grip Push-up",
+    "difficulty": 6,
+    "category": "triceps",
+    "definition": "Same as close-grip push-up but hands grip parallette handles placed close together. Chest descends below the level of the handles — deeper range of motion. Full arm extension at top."
   },
   {
     "id": "diamond",
     "name": "Diamond Push-up",
     "difficulty": 6,
+    "category": "triceps",
     "definition": "Thumbs and index fingers form a diamond shape. Lower sternum to hands, full arm extension."
+  },
+  {
+    "id": "decline_high",
+    "name": "Decline Push-up (High)",
+    "difficulty": 6,
+    "category": "lower_chest",
+    "definition": "Feet elevated on a high surface (~70–90 cm). Straight body line. Chest near the floor, full arm extension at top. Greater shoulder involvement than low decline."
+  },
+  {
+    "id": "staggered",
+    "name": "Staggered Push-up",
+    "difficulty": 6,
+    "category": "core_stability",
+    "definition": "One hand in normal position, the other shifted forward ~15–20 cm. Standard range of motion. Alternate hand positions each rep. Asymmetric load engages core rotators."
   },
   {
     "id": "t_pushup",
     "name": "T Push-up",
     "difficulty": 6,
+    "category": "core_stability",
     "definition": "After each push-up, rotate torso and raise one arm to the ceiling forming a T shape. Alternate sides. Keep hips level."
+  },
+  {
+    "id": "pike_deep",
+    "name": "Pike Push-up (Deep)",
+    "difficulty": 6,
+    "category": "shoulder_overhead",
+    "definition": "Same as pike push-up but hips raised as high as possible — body nearly vertical. Movement becomes almost purely shoulder and triceps. Direct progression toward handstand push-up."
+  },
+  {
+    "id": "parallette_diamond",
+    "name": "Parallette Diamond Push-up",
+    "difficulty": 7,
+    "category": "triceps",
+    "definition": "Same as diamond push-up but hands grip parallette handles in a diamond configuration. Chest descends below the level of the handles. Extreme triceps engagement through full range of motion."
   },
   {
     "id": "archer",
     "name": "Archer Push-up",
     "difficulty": 7,
+    "category": "chest",
     "definition": "Wide hand position. Shift weight to one arm while the other extends sideways. Lower chest to the working arm. Alternate sides each rep."
   },
   {
     "id": "clap",
     "name": "Clap Push-up",
     "difficulty": 7,
-    "definition": "Explosive push-up. Hands leave the floor at the top, clap in the air, land softly and absorb with bent elbows."
+    "category": "explosive",
+    "definition": "Explosive push-up. Hands leave the floor at the top, clap in the air, land softly and absorb with bent elbows. ATP-PCr energy system. Realistic max per set: 10–20 reps."
+  },
+  {
+    "id": "fingertip",
+    "name": "Fingertip Push-up",
+    "difficulty": 7,
+    "category": "unilateral_advanced",
+    "definition": "Same as standard push-up but supported only on fingertips (4–5 fingers). Fingers do not collapse excessively. Full range of motion. Requires extreme grip and finger strength."
+  },
+  {
+    "id": "spiderman",
+    "name": "Spider-Man Push-up",
+    "difficulty": 7,
+    "category": "core_stability",
+    "definition": "On the descent, one leg bends and the knee pulls toward the elbow on the same side. Leg returns on the ascent. Alternate sides. Chest close to the floor at the bottom."
+  },
+  {
+    "id": "alligator",
+    "name": "Alligator Push-up",
+    "difficulty": 7,
+    "category": "core_stability",
+    "definition": "With each rep, one hand steps forward then the other — walking push-up. Chest close to the floor at the bottom. Full arm extension after each step."
+  },
+  {
+    "id": "lsit_parallette",
+    "name": "L-Sit Push-up (Parallettes)",
+    "difficulty": 8,
+    "category": "unilateral_advanced",
+    "definition": "On parallettes. Legs held horizontally in front of the body (90 degrees at hips, legs straight) throughout the entire movement. Full push-up range of motion up and down. Combines chest and triceps strength with hip flexor and core strength."
+  },
+  {
+    "id": "double_clap",
+    "name": "Double Clap Push-up",
+    "difficulty": 9,
+    "category": "explosive",
+    "definition": "Same as clap push-up but two claps are performed in mid-air. Requires significantly greater explosive power. Realistic max per set: 3–5 reps."
+  },
+  {
+    "id": "superman",
+    "name": "Superman Push-up",
+    "difficulty": 9,
+    "category": "explosive",
+    "definition": "Explosive push-up — both hands and feet leave the floor simultaneously at the top. Soft landing. Realistic max per set: 1–3 reps."
+  },
+  {
+    "id": "hspu_wall",
+    "name": "Handstand Push-up (Wall-Supported)",
+    "difficulty": 9,
+    "category": "shoulder_overhead",
+    "definition": "Handstand against a wall. Descent: head nearly touches the floor or a mat. Push to full handstand. Wall stabilises balance. Realistic max per set: 5–15 reps."
+  },
+  {
+    "id": "oap",
+    "name": "One-Arm Push-up",
+    "difficulty": 9,
+    "category": "unilateral_advanced",
+    "definition": "One hand behind the back or at the side. Feet shoulder-width apart (easier) or together (harder). Chest descends close to the floor on the working arm side. Full arm extension. Hips and shoulders remain level — no rotation. Realistic max per set: 3–8 reps."
+  },
+  {
+    "id": "tuck_planche",
+    "name": "Tuck Planche Push-up (Parallettes)",
+    "difficulty": 9,
+    "category": "unilateral_advanced",
+    "definition": "On parallettes. Tuck planche position — knees drawn to chest, body parallel to the floor. Full descent and extension without feet touching the floor. Realistic max per set: 3–8 reps."
+  },
+  {
+    "id": "hspu_free",
+    "name": "Handstand Push-up (Freestanding)",
+    "difficulty": 10,
+    "category": "shoulder_overhead",
+    "definition": "Handstand without wall support. Full balance control required at every point in the movement. Descent: head nearly touches the floor. Push to full handstand. Realistic max per set: 3–8 reps."
+  },
+  {
+    "id": "full_planche",
+    "name": "Full Planche Push-up (Parallettes)",
+    "difficulty": 10,
+    "category": "unilateral_advanced",
+    "definition": "On parallettes. Full planche — legs straight and parallel to the floor, shoulders in front of hands. Full descent and arm extension without any body part touching the floor. Realistic max per set: 1–3 reps."
   }
 ]
