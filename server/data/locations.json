@@ -20,7 +20,8 @@
         { "type": "fight", "monster": "Fallen One (sword)",  "weight": 8,  "cryptic_chance": 0.3 },
         { "type": "fight", "monster": "Skeleton",            "weight": 12, "cryptic_chance": 0.5 },
         { "type": "fight", "monster": "Scavenger",           "weight": 6,  "cryptic_chance": 0.4 },
-        { "type": "nothing",                                  "weight": 16, "cryptic_chance": 0.65 },
+        { "type": "butcher",                                  "weight": 7,  "cryptic_chance": 0.85 },
+        { "type": "nothing",                                  "weight": 9,  "cryptic_chance": 0.65 },
         { "type": "level_up",                                 "weight": 10, "cryptic_chance": 0.35 },
         { "type": "level",  "target_level": 2,               "weight": 20, "cryptic_chance": 0.3 }
       ],
@@ -34,6 +35,13 @@
             "Scratch marks cover the walls leading this way.",
             "A low moan echoes from the darkness ahead.",
             "The stench of death grows stronger in this direction."
+          ],
+          "butcher": [
+            "The smell of blood is overwhelming. Something massive shifts beyond.",
+            "A rhythmic chopping sound echoes from this chamber. Wet. Heavy.",
+            "Flies swarm near this passage. Something large breathes within.",
+            "The floor here is stained almost black. Whatever lives here has fed well.",
+            "A deep, rattling grunt reverberates through the stones."
           ],
           "nothing": [
             "A shadowed path leads into the unknown.",
@@ -56,6 +64,7 @@
           "Fallen One (sword)": "A Fallen One clutches a chipped sword, shrieking curses.",
           "Skeleton":           "An animated skeleton guards the passage with hollow eyes.",
           "Scavenger":          "A four-legged carrion beast crouches in the darkness ahead.",
+          "The Butcher":        "AHHH... fresh meat! A massive demon butcher fills the room. His cleaver is already raised.",
           "nothing":            "The path ahead appears clear — for now.",
           "level_up":           "Stairs wind upward toward the surface.",
           "level":              "Stairs descend deeper into the cathedral's bowels."

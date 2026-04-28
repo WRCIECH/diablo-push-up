@@ -23,6 +23,7 @@ export function generateDungeon(levelId, locationsData) {
   let counter = 0;
   let levelPlaced   = false;  // exactly one staircase down per dungeon
   let levelUpPlaced = false;  // exactly one staircase up per dungeon
+  let butcherPlaced = false;  // The Butcher appears at most once
   const nodes = {};
   const nothingEntry = place_pool.find(p => p.type === 'nothing') ?? place_pool[0];
 
@@ -48,9 +49,13 @@ export function generateDungeon(levelId, locationsData) {
         if (levelUpPlaced) place = nothingEntry;
         else levelUpPlaced = true;
       }
+      if (place.type === 'butcher') {
+        if (butcherPlaced) place = nothingEntry;
+        else butcherPlaced = true;
+      }
       const cryptic = Math.random() < (place.cryptic_chance ?? 0.5);
 
-      // For fight nodes, draw additional enemies with decreasing probability
+      // Build monster list for fight / butcher nodes
       const monsters = [];
       if (place.type === 'fight') {
         monsters.push(place.monster);
@@ -60,11 +65,17 @@ export function generateDungeon(levelId, locationsData) {
           monsters.push(weightedPick(fightPool).monster);
         }
       }
+      if (place.type === 'butcher') {
+        monsters.push('The Butcher'); // always solo — no additional enemies
+      }
+
+      // Butcher uses fight node type so the map renders it as a normal fight room
+      const nodeType = place.type === 'butcher' ? 'fight' : place.type;
 
       node = {
         id,
         depth:       currentDepth,
-        type:        place.type,
+        type:        nodeType,
         monsters,
         targetLevel: place.target_level || null,
         cryptic,
@@ -116,7 +127,10 @@ export function getChildDescription(child, levelDef) {
     return `Remains of ${names}. Passage clear.`;
   }
   if (child.cryptic) {
-    const pool = levelDef.descriptions.cryptic[child.type] || ['A passage leads onward.'];
+    // Butcher rooms use their own atmospheric cryptic descriptions
+    const isPrimordialBoss = monsters[0] === 'The Butcher';
+    const crypticKey = isPrimordialBoss ? 'butcher' : child.type;
+    const pool = levelDef.descriptions.cryptic[crypticKey] || levelDef.descriptions.cryptic[child.type] || ['A passage leads onward.'];
     return pool[parseInt(child.id, 10) % pool.length];
   }
   if (child.type === 'fight') {
@@ -133,6 +147,8 @@ export function getArrivalMessage(node) {
   if (node.type === 'nothing') return 'Nothing of value here. Your torch casts long shadows on the stone walls.';
   if (node.type === 'fight' && node.defeated) {
     const monsters = getMonsters(node);
+    if (monsters[0] === 'The Butcher')
+      return 'The Butcher lies slain. His cleaver is silent. The stench of blood lingers.';
     const names = monsters.length > 1 ? `${monsters[0]} and company` : monsters[0];
     return `${names} ${monsters.length > 1 ? 'have' : 'has'} been slain. The chamber falls silent.`;
   }
