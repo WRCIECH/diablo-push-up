@@ -61,8 +61,9 @@ function roomStyle(node, isCurrent, vis) {
   }
 
   switch (node.type) {
-    case 'entrance': return { fill: '#1e1408', stroke: '#c4991e', sw: 1.5 };
-    case 'level':    return { fill: '#141008', stroke: '#8a6a14', sw: 1.2 };
+    case 'entrance':  return { fill: '#1e1408', stroke: '#c4991e', sw: 1.5 };
+    case 'level':     return { fill: '#141008', stroke: '#8a6a14', sw: 1.2 };
+    case 'level_up':  return { fill: '#081418', stroke: '#148a8a', sw: 1.2 };
     case 'fight':    return node.defeated
       ? { fill: '#071407', stroke: '#2a6a2a', sw: 1.2 }
       : { fill: '#1e0808', stroke: '#9a2020', sw: 1.5 };
@@ -330,12 +331,20 @@ export default function DungeonMap({ dungeon, onClose, inline, onNavigate, onBac
                       {node.defeated ? '✓' : '⚔'}
                     </text>
                   )}
-                  {/* Stairs icon */}
+                  {/* Stairs down icon */}
                   {node.type === 'level' && !isCurrent && (
                     <text x={rx + ROOM/2} y={ry + ROOM/2 + 5}
                           textAnchor="middle" fontSize="13"
                           fill="#c4991e" opacity={vis === 'dim' ? 0.4 : 0.9}>
                       ↓
+                    </text>
+                  )}
+                  {/* Stairs up icon */}
+                  {node.type === 'level_up' && !isCurrent && (
+                    <text x={rx + ROOM/2} y={ry + ROOM/2 + 5}
+                          textAnchor="middle" fontSize="13"
+                          fill="#14aaaa" opacity={vis === 'dim' ? 0.4 : 0.9}>
+                      ↑
                     </text>
                   )}
                   {/* Current position marker */}

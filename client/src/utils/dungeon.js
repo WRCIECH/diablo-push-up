@@ -21,7 +21,8 @@ export function generateDungeon(levelId, locationsData) {
   const { depth, place_pool, intro_texts } = levelDef;
 
   let counter = 0;
-  let levelPlaced = false;   // only one level-transition per dungeon
+  let levelPlaced   = false;  // exactly one staircase down per dungeon
+  let levelUpPlaced = false;  // exactly one staircase up per dungeon
   const nodes = {};
   const nothingEntry = place_pool.find(p => p.type === 'nothing') ?? place_pool[0];
 
@@ -38,10 +39,14 @@ export function generateDungeon(levelId, locationsData) {
       };
     } else {
       let place = weightedPick(place_pool);
-      // Enforce a single level-transition node in the whole dungeon
+      // Enforce exactly one staircase of each direction per dungeon
       if (place.type === 'level') {
         if (levelPlaced) place = nothingEntry;
         else levelPlaced = true;
+      }
+      if (place.type === 'level_up') {
+        if (levelUpPlaced) place = nothingEntry;
+        else levelUpPlaced = true;
       }
       const cryptic = Math.random() < (place.cryptic_chance ?? 0.5);
 
@@ -118,8 +123,9 @@ export function getChildDescription(child, levelDef) {
     const base = levelDef.descriptions.visible[monsters[0]] || 'A creature stirs ahead.';
     return monsters.length > 1 ? `${base} Others lurk nearby.` : base;
   }
-  if (child.type === 'nothing') return levelDef.descriptions.visible.nothing;
-  if (child.type === 'level')   return levelDef.descriptions.visible.level;
+  if (child.type === 'nothing')   return levelDef.descriptions.visible.nothing;
+  if (child.type === 'level')     return levelDef.descriptions.visible.level;
+  if (child.type === 'level_up')  return levelDef.descriptions.visible.level_up || 'Stairs lead upward.';
   return 'A passage continues forward.';
 }
 
@@ -130,7 +136,8 @@ export function getArrivalMessage(node) {
     const names = monsters.length > 1 ? `${monsters[0]} and company` : monsters[0];
     return `${names} ${monsters.length > 1 ? 'have' : 'has'} been slain. The chamber falls silent.`;
   }
-  if (node.type === 'level') return 'Stone steps descend into deeper darkness. The cold rises from below.';
+  if (node.type === 'level')    return 'Stone steps descend into deeper darkness. The cold rises from below.';
+  if (node.type === 'level_up') return 'Ancient stairs wind upward. You could ascend from here.';
   return null;
 }
 
@@ -146,9 +153,10 @@ export function depthLabel(depth) {
 
 // Icon for a dungeon node based on type and state
 export function nodeIcon(node) {
-  if (node.type === 'fight')   return node.defeated ? '✓' : '⚔';
-  if (node.type === 'level')   return '↓';
-  if (node.type === 'nothing') return '·';
-  if (node.cryptic)            return '?';
+  if (node.type === 'fight')    return node.defeated ? '✓' : '⚔';
+  if (node.type === 'level')    return '↓';
+  if (node.type === 'level_up') return '↑';
+  if (node.type === 'nothing')  return '·';
+  if (node.cryptic)             return '?';
   return '·';
 }

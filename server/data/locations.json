@@ -20,7 +20,8 @@
         { "type": "fight", "monster": "Fallen One (sword)",  "weight": 8,  "cryptic_chance": 0.3 },
         { "type": "fight", "monster": "Skeleton",            "weight": 12, "cryptic_chance": 0.5 },
         { "type": "fight", "monster": "Scavenger",           "weight": 6,  "cryptic_chance": 0.4 },
-        { "type": "nothing",                                  "weight": 26, "cryptic_chance": 0.65 },
+        { "type": "nothing",                                  "weight": 16, "cryptic_chance": 0.65 },
+        { "type": "level_up",                                 "weight": 10, "cryptic_chance": 0.35 },
         { "type": "level",  "target_level": 2,               "weight": 20, "cryptic_chance": 0.3 }
       ],
       "descriptions": {
@@ -56,6 +57,7 @@
           "Skeleton":           "An animated skeleton guards the passage with hollow eyes.",
           "Scavenger":          "A four-legged carrion beast crouches in the darkness ahead.",
           "nothing":            "The path ahead appears clear — for now.",
+          "level_up":           "Stairs wind upward toward the surface.",
           "level":              "Stairs descend deeper into the cathedral's bowels."
         }
       }
@@ -82,7 +84,8 @@
         { "type": "fight", "monster": "Dark One",        "weight": 6,  "cryptic_chance": 0.45 },
         { "type": "fight", "monster": "Black Death",     "weight": 3,  "cryptic_chance": 0.7 },
         { "type": "fight", "monster": "Burning Dead",    "weight": 2,  "cryptic_chance": 0.7 },
-        { "type": "nothing",                              "weight": 20, "cryptic_chance": 0.65 },
+        { "type": "nothing",                              "weight": 10, "cryptic_chance": 0.65 },
+        { "type": "level_up",                             "weight": 10, "cryptic_chance": 0.35 },
         { "type": "level",  "target_level": 3,           "weight": 20, "cryptic_chance": 0.35 }
       ],
       "descriptions": {
@@ -120,6 +123,7 @@
           "Black Death":     "An enormous undead monstrosity fills the corridor. The air reeks of plague.",
           "Burning Dead":    "A skeleton wreathed in hellfire charges toward you, screeching.",
           "nothing":         "The chamber is empty — save for old bones and forgotten trinkets.",
+          "level_up":        "Worn stone stairs climb back toward the first level.",
           "level":           "Stairs descend to the third level of the cathedral."
         }
       }

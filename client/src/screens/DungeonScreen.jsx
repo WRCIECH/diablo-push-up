@@ -248,8 +248,9 @@ export default function DungeonScreen() {
   const currentNode = dungeon?.nodes[dungeon?.currentNodeId];
   const levelDef    = getLevelDef(dungeon?.levelId, gameData?.locations);
 
-  const [phase,        setPhase]        = useState('loading');
-  const [levelConfirm, setLevelConfirm] = useState(false);
+  const [phase,          setPhase]          = useState('loading');
+  const [levelConfirm,   setLevelConfirm]   = useState(false);
+  const [levelUpConfirm, setLevelUpConfirm] = useState(false);
 
   useEffect(() => {
     if (!dungeon || !currentNode) return;
@@ -261,9 +262,11 @@ export default function DungeonScreen() {
     const target = dungeon.nodes[nodeId];
     if (!target) return;
     setLevelConfirm(false);
+    setLevelUpConfirm(false);
     dispatchAndSave({ type: 'NAVIGATE_TO_NODE', payload: { nodeId } });
-    if (target.type === 'fight' && !target.defeated) { setScreen('fight_pre'); return; }
-    if (target.type === 'level') { setLevelConfirm(true); return; }
+    if (target.type === 'fight'    && !target.defeated) { setScreen('fight_pre'); return; }
+    if (target.type === 'level')                        { setLevelConfirm(true);   return; }
+    if (target.type === 'level_up')                     { setLevelUpConfirm(true); return; }
   }, [dungeon, dispatchAndSave, setScreen]);
 
   const goBack = useCallback(() => {
@@ -370,6 +373,39 @@ export default function DungeonScreen() {
                       setPhase('intro');
                     }}>
               Descend
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Ascend confirm */}
+      {levelUpConfirm && (
+        <div className="panel" style={{ padding: '12px', flexShrink: 0, boxShadow: '0 0 0 2px #148a8a' }}>
+          <div className="title-small" style={{ marginBottom: '6px' }}>
+            {dungeon.levelId === 1 ? 'Return to Tristram?' : `Ascend to Level ${dungeon.levelId - 1}?`}
+          </div>
+          <div className="text-flavor" style={{ fontSize: '12px', marginBottom: '10px' }}>
+            {dungeon.levelId === 1
+              ? 'The surface and safety lie above. You can always return.'
+              : 'The stairs lead back up. Your progress on this level will be lost.'}
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button className="btn btn-ghost btn-full" style={{ fontSize: '12px' }}
+                    onClick={() => setLevelUpConfirm(false)}>Stay</button>
+            <button className="btn btn-primary btn-full" style={{ fontSize: '12px' }}
+                    onClick={() => {
+                      if (dungeon.levelId === 1) {
+                        dispatchAndSave({ type: 'LEAVE_DUNGEON' });
+                        setScreen('tristram');
+                      } else {
+                        const prevId     = dungeon.levelId - 1;
+                        const newDungeon = generateDungeon(prevId, gameData.locations);
+                        dispatchAndSave({ type: 'SET_DUNGEON', payload: newDungeon });
+                        setLevelUpConfirm(false);
+                        setPhase('intro');
+                      }
+                    }}>
+              Ascend
             </button>
           </div>
         </div>
