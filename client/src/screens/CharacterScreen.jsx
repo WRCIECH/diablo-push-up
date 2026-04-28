@@ -119,13 +119,16 @@ function buildStatRows(item) {
 
 // ── Item detail modal ─────────────────────────────────────────────────────────
 
-function ItemDetailModal({ selection, onClose, onEquip, onUnequip, onSell, onUse }) {
+const DUNGEON_IDENTIFY_COST = 100;
+
+function ItemDetailModal({ selection, onClose, onEquip, onUnequip, onSell, onUse, onIdentify, inDungeon, playerGold }) {
   const { item, source, slot } = selection;
-  const name       = resolveItemName(item);
-  const color      = qualityColor(item.quality);
-  const isEquipped = source === 'equipped';
-  const isPotion   = item.slot === 'potion';
-  const statRows   = item.identified || item.quality === 'normal' ? buildStatRows(item) : [];
+  const name         = resolveItemName(item);
+  const color        = qualityColor(item.quality);
+  const isEquipped   = source === 'equipped';
+  const isPotion     = item.slot === 'potion';
+  const isUnidentified = item.quality !== 'normal' && !item.identified;
+  const statRows     = item.identified || item.quality === 'normal' ? buildStatRows(item) : [];
 
   return (
     <div
@@ -169,9 +172,23 @@ function ItemDetailModal({ selection, onClose, onEquip, onUnequip, onSell, onUse
         <div className="divider" style={{ marginBottom: '10px' }}/>
 
         {/* Stats */}
-        {!item.identified && item.quality !== 'normal' ? (
-          <div style={{ color: 'var(--text-dim)', fontSize: '12px', fontStyle: 'italic', padding: '4px 0 8px' }}>
-            Visit Deckard Cain to identify (100g)
+        {isUnidentified ? (
+          <div style={{ padding: '4px 0 8px' }}>
+            <div style={{ color: 'var(--text-dim)', fontSize: '12px', fontStyle: 'italic', marginBottom: inDungeon ? '8px' : 0 }}>
+              {inDungeon
+                ? `Identify here for ${DUNGEON_IDENTIFY_COST}g, or visit Deckard Cain for 50g.`
+                : 'Visit Deckard Cain in Tristram to identify (50g).'}
+            </div>
+            {inDungeon && (
+              <button
+                className="btn btn-primary btn-full"
+                style={{ fontSize: '12px' }}
+                disabled={playerGold < DUNGEON_IDENTIFY_COST}
+                onClick={() => { onIdentify(item); onClose(); }}
+              >
+                {playerGold >= DUNGEON_IDENTIFY_COST ? `Identify (${DUNGEON_IDENTIFY_COST}g)` : 'Not enough gold'}
+              </button>
+            )}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '10px' }}>
@@ -240,7 +257,7 @@ function ItemDetailModal({ selection, onClose, onEquip, onUnequip, onSell, onUse
 
 const PAGE_SIZE = 4 * 5; // 4 columns × 5 rows = 20 items per page
 
-function GearPanel({ player, onEquip, onUnequip, onSell, onUse }) {
+function GearPanel({ player, onEquip, onUnequip, onSell, onUse, onIdentify, inDungeon }) {
   const [selected, setSelected] = useState(null);
   const [page, setPage]         = useState(0);
 
@@ -302,10 +319,13 @@ function GearPanel({ player, onEquip, onUnequip, onSell, onUse }) {
         <ItemDetailModal
           selection={selected}
           onClose={() => setSelected(null)}
-          onEquip={item  => { onEquip(item);        setSelected(null); }}
-          onUnequip={sl  => { onUnequip(sl);         setSelected(null); }}
-          onSell={item   => { onSell(item);          setSelected(null); }}
-          onUse={item    => { onUse(item);           setSelected(null); }}
+          onEquip={item    => { onEquip(item);    setSelected(null); }}
+          onUnequip={sl    => { onUnequip(sl);    setSelected(null); }}
+          onSell={item     => { onSell(item);     setSelected(null); }}
+          onUse={item      => { onUse(item);      setSelected(null); }}
+          onIdentify={item => { onIdentify(item); setSelected(null); }}
+          inDungeon={inDungeon}
+          playerGold={player.gold}
         />
       )}
     </>
@@ -476,14 +496,20 @@ export default function CharacterScreen() {
   const expPct      = expNeeded ? Math.min((player.exp / expNeeded) * 100, 100) : 100;
   const canAllocate = (player.statPoints || 0) > 0;
 
-  function allocate(stat)    { dispatchAndSave({ type: 'ALLOCATE_STAT',  payload: { stat } }); }
-  function equipItem(item)   { dispatchAndSave({ type: 'EQUIP_ITEM',     payload: item }); }
-  function unequipItem(slot) { dispatchAndSave({ type: 'UNEQUIP_SLOT',   payload: slot }); }
-  function sellItem(item)    {
+  const inDungeon = state.currentLocation === 'dungeon';
+
+  function allocate(stat)      { dispatchAndSave({ type: 'ALLOCATE_STAT',  payload: { stat } }); }
+  function equipItem(item)     { dispatchAndSave({ type: 'EQUIP_ITEM',     payload: item }); }
+  function unequipItem(slot)   { dispatchAndSave({ type: 'UNEQUIP_SLOT',   payload: slot }); }
+  function sellItem(item)      {
     dispatchAndSave({ type: 'REMOVE_ITEM', payload: item.uid });
     dispatchAndSave({ type: 'ADD_GOLD',    payload: item.sell_price });
   }
-  function usePotion(item)   { dispatchAndSave({ type: 'USE_POTION',     payload: item.uid }); }
+  function usePotion(item)     { dispatchAndSave({ type: 'USE_POTION',     payload: item.uid }); }
+  function identifyItem(item)  {
+    dispatchAndSave({ type: 'SPEND_GOLD',    payload: DUNGEON_IDENTIFY_COST });
+    dispatchAndSave({ type: 'IDENTIFY_ITEM', payload: item.uid });
+  }
 
   return (
     <div className="screen" style={{ padding: 0, gap: 0 }}>
@@ -527,6 +553,8 @@ export default function CharacterScreen() {
             onUnequip={unequipItem}
             onSell={sellItem}
             onUse={usePotion}
+            onIdentify={identifyItem}
+            inDungeon={inDungeon}
           />
         )}
         {tab === 'log'   && <LogPanel history={state.history}/>}

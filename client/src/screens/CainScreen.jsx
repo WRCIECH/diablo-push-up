@@ -3,12 +3,12 @@ import { useGame } from '../context/GameContext.jsx';
 import { resolveItemName, qualityColor, getItemStatLine } from '../utils/items.js';
 import { useMusic } from '../hooks/useMusic.js';
 
-const IDENTIFY_COST = 100;
+const IDENTIFY_COST = 50;
 
 const DIALOGS = {
   idle: 'Stay a while and listen, adventurer. These are dark times. The evil that stirs beneath this cathedral has awakened forces I have not seen in a lifetime of study.',
   no_items: 'I see nothing upon your person that requires my expertise. Return when you have found items of a magical nature.',
-  no_gold: 'I\'m afraid I cannot identify this without proper compensation. My fee is 100 gold pieces — not a copper less, I assure you.',
+  no_gold: 'I\'m afraid I cannot identify this without proper compensation. My fee is 50 gold pieces — not a copper less, I assure you.',
   identified: 'Ah yes, a most interesting item. The enchantments within are now revealed to you. Use it well, adventurer.',
 };
 
