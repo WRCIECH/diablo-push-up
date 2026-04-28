@@ -154,16 +154,6 @@ function ItemModal({ item, mode, playerGold, onClose, onAction }) {
           </div>
         )}
 
-        {/* Prefix / suffix */}
-        {item.identified && (item.prefix || item.suffix) && (
-          <>
-            <div className="divider" style={{ marginBottom: '8px' }}/>
-            <div style={{ fontSize: '11px', color: 'var(--blue-text)', marginBottom: '10px', fontStyle: 'italic' }}>
-              {[item.prefix?.name, item.suffix?.name].filter(Boolean).join(' · ')}
-            </div>
-          </>
-        )}
-
         <div className="divider" style={{ marginBottom: '10px' }}/>
 
         {/* Price */}

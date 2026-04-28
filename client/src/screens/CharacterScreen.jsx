@@ -201,16 +201,6 @@ function ItemDetailModal({ selection, onClose, onEquip, onUnequip, onSell, onUse
           </div>
         )}
 
-        {/* Prefix / suffix names */}
-        {item.identified && (item.prefix || item.suffix) && (
-          <>
-            <div className="divider" style={{ marginBottom: '8px' }}/>
-            <div style={{ fontSize: '11px', color: 'var(--blue-text)', marginBottom: '10px', fontStyle: 'italic' }}>
-              {[item.prefix?.name, item.suffix?.name].filter(Boolean).join(' · ')}
-            </div>
-          </>
-        )}
-
         <div className="divider" style={{ marginBottom: '10px' }}/>
 
         {/* Sell value */}
