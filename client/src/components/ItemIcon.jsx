@@ -86,6 +86,30 @@ function ArmorContents() {
   </>;
 }
 
+function RingContents() {
+  return <>
+    <circle cx="20" cy="21" r="13" fill="none" stroke="#c4991e" strokeWidth="3.5"/>
+    <circle cx="20" cy="21" r="9"  fill="none" stroke="#8a6a14" strokeWidth="1"/>
+    <circle cx="20"  cy="8"  r="4.5" fill="#8b1a1a" stroke="#cc3333" strokeWidth="1"/>
+    <circle cx="20"  cy="8"  r="2.5" fill="#ee4444" opacity="0.55"/>
+    <circle cx="20"  cy="8"  r="1.2" fill="#ffaaaa" opacity="0.4"/>
+  </>;
+}
+
+function TalismanContents() {
+  return <>
+    {/* Chain */}
+    <path d="M20,3 L20,10" stroke="#c4991e" strokeWidth="1.5" strokeLinecap="round"/>
+    {/* Pentagon body */}
+    <polygon points="20,10 29,17 26,28 14,28 11,17" fill="#2a1a40" stroke="#9070d0" strokeWidth="1.5"/>
+    {/* Inner gem */}
+    <polygon points="20,14 25,19 23,25 17,25 15,19" fill="#6040b0" opacity="0.85"/>
+    {/* Gem highlight */}
+    <polygon points="20,14 25,19 23,25 17,25 15,19" fill="none" stroke="#c0a0ff" strokeWidth="0.6" opacity="0.6"/>
+    <circle cx="20" cy="20" r="2" fill="#d0b0ff" opacity="0.5"/>
+  </>;
+}
+
 function PotionContents({ full }) {
   const col = full ? '#c4991e' : '#cc2222';
   const hi  = full ? '#f0c040' : '#ee4444';
@@ -106,6 +130,8 @@ export default function ItemIcon({ item, size = 40 }) {
 
   let contents;
   if (slot === 'potion')                   contents = <PotionContents full={item.heal === 'full'}/>;
+  else if (slot === 'ring')                contents = <RingContents/>;
+  else if (slot === 'talisman')            contents = <TalismanContents/>;
   else if (slot === 'shield')              contents = <ShieldContents/>;
   else if (slot === 'helm')                contents = <HelmContents/>;
   else if (slot === 'armor')               contents = <ArmorContents/>;

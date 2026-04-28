@@ -20,6 +20,8 @@ export function initConstants(serverC) {
   if (serverC.PENALTY_DURATION_MS !== undefined) C.PENALTY_MS = serverC.PENALTY_DURATION_MS;
 }
 
+import { getEffectiveStats } from './items.js';
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function clamp(v, lo, hi) { return Math.min(Math.max(v, lo), hi); }
@@ -64,6 +66,7 @@ function getArmorAC(player) {
  */
 // monsters is always an array (single-monster fights pass a one-element array)
 export function calculateFight(player, monsters, pushUpData) {
+  const stats = getEffectiveStats(player); // base stats + all equipped item affix bonuses
 
   // ── Weapon stats (shared across steps) ───────────────────────────────────
   const weaponAvgDamage = player.equipment.weapon
@@ -75,7 +78,7 @@ export function calculateFight(player, monsters, pushUpData) {
 
   // ── Step 0: Generate raw pool from all monsters ───────────────────────────
   // Each monster contributes its own sub-pool; attacks resolve against that sub-pool only.
-  const playerAC = Math.floor(player.stats.dexterity / 5) + getArmorAC(player);
+  const playerAC = Math.floor(stats.dexterity / 5) + getArmorAC(player);
   const rawPool  = [];
   let baseTimeReduction = 0;
   let hitsOnPlayer      = 0;
@@ -107,7 +110,7 @@ export function calculateFight(player, monsters, pushUpData) {
 
   // ── Step 1: Strength ease (probabilistic, per push-up) ───────────────────
   const easeChance = clamp(
-    (40 + Math.floor(player.stats.strength / 2) + Math.floor(weaponAvgDamage)) / 100,
+    (40 + Math.floor(stats.strength / 2) + Math.floor(weaponAvgDamage)) / 100,
     C.HIT_CHANCE_MIN, C.HIT_CHANCE_MAX
   );
   const easeAmount = Math.max(1, Math.floor(weaponAvgDamage / 2));
@@ -124,13 +127,13 @@ export function calculateFight(player, monsters, pushUpData) {
   // ── Step 2: Dexterity skip (probabilistic, per push-up in easedPool) ─────
   // Use average monster AC so mixed groups scale the skip chance proportionally.
   const avgAC          = Math.round(monsters.reduce((s, m) => s + m.ac, 0) / monsters.length);
-  const playerToHitPct = 50 + Math.floor(player.stats.dexterity / 2) + player.level;
+  const playerToHitPct = 50 + Math.floor(stats.dexterity / 2) + player.level;
   const skipChance     = clamp((playerToHitPct - avgAC) / 2 / 100,
                                C.HIT_CHANCE_MIN, C.HIT_CHANCE_MAX);
   const finalPushUps   = easedPool.filter(() => Math.random() >= skipChance);
 
   const baseTime       = Math.max(0, C.BASE_FIGHT_TIME - baseTimeReduction);
-  const vitalityBuffer = player.stats.vitality * C.VITALITY_TO_SECONDS;
+  const vitalityBuffer = stats.vitality * C.VITALITY_TO_SECONDS;
 
   return {
     rawPool,

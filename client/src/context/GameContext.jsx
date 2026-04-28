@@ -16,6 +16,7 @@ export const CLASS_TEMPLATES = {
       weapon: { id: 'short_sword', name: 'Short Sword', slot: 'weapon', damage: [2, 6], reqStr: 18, reqDex: 0, price: 120, sell_price: 30, quality: 'normal', identified: true },
       armor: null, helm: null,
       shield: { id: 'buckler', name: 'Buckler', slot: 'shield', ac: 3, reqStr: 0, price: 50, sell_price: 12, quality: 'normal', identified: true },
+      ring1: null, ring2: null, talisman: null,
     },
     inventory: [
       { id: 'club', name: 'Club', slot: 'weapon', damage: [1, 6], reqStr: 0, reqDex: 0, price: 20, sell_price: 5, quality: 'normal', identified: true, uid: 'inv_0' },
@@ -33,6 +34,7 @@ export const CLASS_TEMPLATES = {
     equipment: {
       weapon: { id: 'short_bow', name: 'Short Bow', slot: 'weapon', damage: [1, 4], reqStr: 25, reqDex: 30, price: 100, sell_price: 25, quality: 'normal', identified: true },
       armor: null, helm: null, shield: null,
+      ring1: null, ring2: null, talisman: null,
     },
     inventory: [
       { id: 'healing_potion', name: 'Healing Potion', slot: 'potion', type: 'healing', heal: 'partial', price: 50, sell_price: 12, quality: 'normal', identified: true, uid: 'inv_0' },
@@ -127,10 +129,16 @@ export function reducer(state, action) {
 
     case 'EQUIP_ITEM': {
       const item = action.payload;
-      const old = state.player.equipment[item.slot];
+      // Rings fill ring1 first, then ring2; replace ring1 if both full
+      const equipSlot = item.slot === 'ring'
+        ? (!state.player.equipment.ring1 ? 'ring1'
+         : !state.player.equipment.ring2 ? 'ring2'
+         : 'ring1')
+        : item.slot;
+      const old = state.player.equipment[equipSlot];
       const inv = state.player.inventory.filter(i => i.uid !== item.uid);
       if (old) inv.push({ ...old, uid: `inv_${Date.now()}` });
-      return { ...state, player: { ...state.player, equipment: { ...state.player.equipment, [item.slot]: item }, inventory: inv } };
+      return { ...state, player: { ...state.player, equipment: { ...state.player.equipment, [equipSlot]: item }, inventory: inv } };
     }
 
     case 'IDENTIFY_ITEM': {

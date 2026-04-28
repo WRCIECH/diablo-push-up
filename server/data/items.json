@@ -28,6 +28,14 @@
     { "id": "healing_potion", "name": "Healing Potion", "slot": "potion", "type": "healing", "heal": "partial", "price": 50, "sell_price": 12 },
     { "id": "full_healing_potion", "name": "Full Healing Potion", "slot": "potion", "type": "healing", "heal": "full", "price": 150, "sell_price": 37 }
   ],
+  "rings": [
+    { "id": "ring",      "name": "Ring",      "slot": "ring",     "price": 80,  "sell_price": 20 },
+    { "id": "gold_ring", "name": "Gold Ring", "slot": "ring",     "price": 120, "sell_price": 30 }
+  ],
+  "talismans": [
+    { "id": "talisman", "name": "Talisman", "slot": "talisman", "price": 150, "sell_price": 38 },
+    { "id": "amulet",   "name": "Amulet",   "slot": "talisman", "price": 200, "sell_price": 50 }
+  ],
   "prefixes": {
     "weapon": [
       { "id": "tin", "name": "Tin", "bonus": { "damage_flat_min": 1, "damage_flat_max": 2 }, "price_mult": 1.5 },
@@ -39,6 +47,12 @@
       { "id": "leather_prefix", "name": "Leather", "bonus": { "ac_min": 1, "ac_max": 5 }, "price_mult": 1.5 },
       { "id": "hard", "name": "Hard", "bonus": { "ac_min": 5, "ac_max": 10 }, "price_mult": 2.0 },
       { "id": "fortified", "name": "Fortified", "bonus": { "ac_min": 15, "ac_max": 20 }, "price_mult": 3.0 }
+    ],
+    "jewelry": [
+      { "id": "jade",     "name": "Jade",     "bonus": { "dex_min": 3,  "dex_max": 8  }, "price_mult": 1.5 },
+      { "id": "obsidian", "name": "Obsidian", "bonus": { "str_min": 3,  "str_max": 8  }, "price_mult": 1.5 },
+      { "id": "amber",    "name": "Amber",    "bonus": { "vit_min": 3,  "vit_max": 8  }, "price_mult": 1.5 },
+      { "id": "ruby",     "name": "Ruby",     "bonus": { "life_min": 10, "life_max": 25 }, "price_mult": 2.0 }
     ]
   },
   "suffixes": {
@@ -51,6 +65,12 @@
       { "id": "of_the_fox", "name": "of the Fox", "bonus": { "dex_min": 1, "dex_max": 5 }, "price_mult": 1.5 },
       { "id": "of_vim", "name": "of Vim", "bonus": { "vit_min": 1, "vit_max": 5 }, "price_mult": 1.5 },
       { "id": "of_health", "name": "of Health", "bonus": { "life_min": 10, "life_max": 20 }, "price_mult": 2.0 }
+    ],
+    "jewelry": [
+      { "id": "of_the_zodiac", "name": "of the Zodiac", "bonus": { "str_min": 2, "str_max": 6  }, "price_mult": 1.5 },
+      { "id": "of_the_stars",  "name": "of the Stars",  "bonus": { "dex_min": 2, "dex_max": 6  }, "price_mult": 1.5 },
+      { "id": "of_the_moon",   "name": "of the Moon",   "bonus": { "vit_min": 2, "vit_max": 6  }, "price_mult": 1.5 },
+      { "id": "of_life",       "name": "of Life",       "bonus": { "life_min": 5, "life_max": 15 }, "price_mult": 2.0 }
     ]
   },
   "starting_equipment": {

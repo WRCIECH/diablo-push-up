@@ -39,7 +39,15 @@ function buildEquipmentPool(itemsData) {
     ...itemsData.shields,
     ...itemsData.helms,
     ...itemsData.armor,
+    ...(itemsData.rings     || []),
+    ...(itemsData.talismans || []),
   ];
+}
+
+function affixKey(slot) {
+  if (slot === 'weapon')   return 'weapon';
+  if (slot === 'ring' || slot === 'talisman') return 'jewelry';
+  return 'armor';
 }
 
 // Chest loot — better odds than monsters (Diablo 1 chest distribution)
@@ -70,9 +78,9 @@ export function rollChestLoot(itemsData) {
 
   if (result === 'magic') {
     const base     = pickRandom(buildEquipmentPool(itemsData));
-    const affixKey = base.slot === 'weapon' ? 'weapon' : 'armor';
-    const availPre = itemsData.prefixes[affixKey] || [];
-    const availSuf = itemsData.suffixes[affixKey] || [];
+    const key = affixKey(base.slot);
+    const availPre = itemsData.prefixes[key] || [];
+    const availSuf = itemsData.suffixes[key] || [];
     const wantPre  = Math.random() < 0.6;
     const wantSuf  = Math.random() < 0.6;
     const prefix   = (wantPre || !wantSuf) && availPre.length ? pickRandom(availPre) : null;
@@ -82,9 +90,9 @@ export function rollChestLoot(itemsData) {
 
   if (result === 'unique') {
     const base     = pickRandom(buildEquipmentPool(itemsData));
-    const affixKey = base.slot === 'weapon' ? 'weapon' : 'armor';
-    const availPre = itemsData.prefixes[affixKey] || [];
-    const availSuf = itemsData.suffixes[affixKey] || [];
+    const key = affixKey(base.slot);
+    const availPre = itemsData.prefixes[key] || [];
+    const availSuf = itemsData.suffixes[key] || [];
     const prefix   = availPre.length ? pickRandom(availPre) : null;
     const suffix   = availSuf.length ? pickRandom(availSuf) : null;
     const item     = createMagicItem(base, prefix, suffix);
@@ -122,9 +130,9 @@ export function rollLoot(monster, itemsData) {
 
   if (result === 'magic') {
     const base       = pickRandom(buildEquipmentPool(itemsData));
-    const affixKey   = base.slot === 'weapon' ? 'weapon' : 'armor';
-    const availPre   = itemsData.prefixes[affixKey] || [];
-    const availSuf   = itemsData.suffixes[affixKey] || [];
+    const key = affixKey(base.slot);
+    const availPre   = itemsData.prefixes[key] || [];
+    const availSuf   = itemsData.suffixes[key] || [];
     const wantPre    = Math.random() < 0.6;
     const wantSuf    = Math.random() < 0.6;
     const prefix     = (wantPre || !wantSuf) && availPre.length ? pickRandom(availPre) : null;
@@ -137,9 +145,9 @@ export function rollLoot(monster, itemsData) {
 
   if (result === 'unique') {
     const base      = pickRandom(buildEquipmentPool(itemsData));
-    const affixKey  = base.slot === 'weapon' ? 'weapon' : 'armor';
-    const availPre = itemsData.prefixes[affixKey] || [];
-    const availSuf = itemsData.suffixes[affixKey] || [];
+    const key = affixKey(base.slot);
+    const availPre = itemsData.prefixes[key] || [];
+    const availSuf = itemsData.suffixes[key] || [];
     const prefix   = availPre.length ? pickRandom(availPre) : null;
     const suffix   = availSuf.length ? pickRandom(availSuf) : null;
     const item     = createMagicItem(base, prefix, suffix);

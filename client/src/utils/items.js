@@ -105,8 +105,8 @@ export function qualityColor(quality) {
   return 'var(--text-cream)';
 }
 
-function collectBonuses(item) {
-  if (!item.identified) return {};
+export function collectBonuses(item) {
+  if (!item || !item.identified) return {};
   const out = {};
   for (const rolled of [item.prefix?.rolled, item.suffix?.rolled]) {
     for (const [k, v] of Object.entries(rolled || {})) {
@@ -114,6 +114,19 @@ function collectBonuses(item) {
     }
   }
   return out;
+}
+
+/** Returns player stats with all identified equipped-item affix bonuses applied. */
+export function getEffectiveStats(player) {
+  const s = { ...player.stats };
+  for (const item of Object.values(player.equipment)) {
+    if (!item) continue;
+    const b = collectBonuses(item);
+    if (b.str)  s.strength  = (s.strength  || 0) + b.str;
+    if (b.dex)  s.dexterity = (s.dexterity || 0) + b.dex;
+    if (b.vit)  s.vitality  = (s.vitality  || 0) + b.vit;
+  }
+  return s;
 }
 
 export function getItemStatLine(item) {

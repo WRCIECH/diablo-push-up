@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGame, EXP_TABLE } from '../context/GameContext.jsx';
 import { calcAC, calcToHit, calcPushUpStats } from '../utils/player.js';
-import { resolveItemName, qualityColor } from '../utils/items.js';
+import { resolveItemName, qualityColor, getEffectiveStats } from '../utils/items.js';
 import { useMusic, getCurrentTrack } from '../hooks/useMusic.js';
 import { C } from '../utils/combat.js';
 import ItemIcon from '../components/ItemIcon.jsx';
@@ -19,7 +19,7 @@ function qualityBorder(quality) {
 
 // ── Equipment slot cell ───────────────────────────────────────────────────────
 
-const SLOT_LABEL = { helm: 'HEAD', armor: 'BODY', weapon: 'WEAPON', shield: 'SHIELD' };
+const SLOT_LABEL = { helm: 'HEAD', armor: 'BODY', weapon: 'WEAPON', shield: 'SHIELD', ring1: 'RING', ring2: 'RING', talisman: 'TALISMAN' };
 
 function EquipSlot({ slot, item, onSelect }) {
   const border = item ? qualityBorder(item.quality) : '#252525';
@@ -262,9 +262,14 @@ function GearPanel({ player, onEquip, onUnequip, onSell, onUse, onIdentify, inDu
       <div className="panel" style={{ padding: '12px', marginBottom: '10px' }}>
         <div className="title-small" style={{ marginBottom: '10px' }}>Equipped</div>
         <div className="divider" style={{ marginBottom: '12px' }}/>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '10px' }}>
           {['helm', 'armor', 'weapon', 'shield'].map(slot => (
             <EquipSlot key={slot} slot={slot} item={player.equipment[slot]} onSelect={setSelected}/>
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+          {['ring1', 'ring2', 'talisman'].map(slot => (
+            <EquipSlot key={slot} slot={slot} item={player.equipment?.[slot] ?? null} onSelect={setSelected}/>
           ))}
         </div>
       </div>
@@ -331,13 +336,14 @@ function GearPanel({ player, onEquip, onUnequip, onSell, onUse, onIdentify, inDu
 function StatsPanel({ player, canAllocate, onAllocate }) {
   const ac    = calcAC(player);
   const toHit = calcToHit(player);
+  const eff            = getEffectiveStats(player);
   const weap           = player.equipment.weapon;
   const weaponAvg      = weap ? (weap.damage[0] + weap.damage[1]) / 2 : 0;
   const easeChancePct  = Math.round(Math.min(0.95, Math.max(0.05,
-    (40 + Math.floor(player.stats.strength / 2) + Math.floor(weaponAvg)) / 100
+    (40 + Math.floor(eff.strength / 2) + Math.floor(weaponAvg)) / 100
   )) * 100);
   const easeAmount     = Math.max(1, Math.floor(weaponAvg / 2));
-  const buffer         = player.stats.vitality * C.VITALITY_TO_SECONDS;
+  const buffer         = eff.vitality * C.VITALITY_TO_SECONDS;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
