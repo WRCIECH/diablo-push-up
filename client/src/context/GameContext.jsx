@@ -194,6 +194,12 @@ export function reducer(state, action) {
     case 'DUNGEON_INTRO_SHOWN':
       return { ...state, dungeon: { ...state.dungeon, introShown: true } };
 
+    case 'MARK_CHEST_LOOTED': {
+      const nodeId = action.payload;
+      const nodes  = { ...state.dungeon.nodes, [nodeId]: { ...state.dungeon.nodes[nodeId], chestLooted: true } };
+      return { ...state, dungeon: { ...state.dungeon, nodes } };
+    }
+
     case 'LEAVE_DUNGEON':
       return { ...state, currentLocation: 'tristram' };
 

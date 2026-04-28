@@ -42,6 +42,60 @@ function buildEquipmentPool(itemsData) {
   ];
 }
 
+// Chest loot — better odds than monsters (Diablo 1 chest distribution)
+const CHEST_DROP_TABLE = [
+  { result: 'nothing', weight: 20 },
+  { result: 'gold',    weight: 35 },
+  { result: 'normal',  weight: 28 },
+  { result: 'magic',   weight: 14 },
+  { result: 'unique',  weight:  3 },
+];
+
+/**
+ * Roll a loot drop for a dungeon chest.
+ * Returns null, { type:'gold', amount } or { type:'item', item }.
+ */
+export function rollChestLoot(itemsData) {
+  const result = weightedPick(CHEST_DROP_TABLE);
+  if (result === 'nothing') return null;
+
+  if (result === 'gold') {
+    return { type: 'gold', amount: rollBetween(10, 80) };
+  }
+
+  if (result === 'normal') {
+    const base = pickRandom(buildBasePool(itemsData));
+    return { type: 'item', item: { ...base, uid: generateUID('chest'), quality: 'normal', identified: true } };
+  }
+
+  if (result === 'magic') {
+    const base     = pickRandom(buildEquipmentPool(itemsData));
+    const affixKey = base.slot === 'weapon' ? 'weapon' : 'armor';
+    const availPre = itemsData.prefixes[affixKey] || [];
+    const availSuf = itemsData.suffixes[affixKey] || [];
+    const wantPre  = Math.random() < 0.6;
+    const wantSuf  = Math.random() < 0.6;
+    const prefix   = (wantPre || !wantSuf) && availPre.length ? pickRandom(availPre) : null;
+    const suffix   = (wantSuf || !prefix)  && availSuf.length ? pickRandom(availSuf) : null;
+    return { type: 'item', item: createMagicItem(base, prefix, suffix) };
+  }
+
+  if (result === 'unique') {
+    const base     = pickRandom(buildEquipmentPool(itemsData));
+    const affixKey = base.slot === 'weapon' ? 'weapon' : 'armor';
+    const availPre = itemsData.prefixes[affixKey] || [];
+    const availSuf = itemsData.suffixes[affixKey] || [];
+    const prefix   = availPre.length ? pickRandom(availPre) : null;
+    const suffix   = availSuf.length ? pickRandom(availSuf) : null;
+    const item     = createMagicItem(base, prefix, suffix);
+    item.quality   = 'unique';
+    item.uid       = generateUID('chest-unique');
+    return { type: 'item', item };
+  }
+
+  return null;
+}
+
 /**
  * Roll a loot drop for one monster kill.
  * Returns null (nothing dropped), a gold amount (number), or an item object.
