@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 import { useMusic } from '../hooks/useMusic.js';
-import { getArrivalMessage, getLevelDef, depthLabel } from '../utils/dungeon.js';
+import { getArrivalMessage, getLevelDef, depthLabel, generateDungeon } from '../utils/dungeon.js';
 import { rollChestLoot } from '../utils/loot.js';
 import { resolveItemName, qualityColor, getItemStatLine } from '../utils/items.js';
 import ItemIcon from '../components/ItemIcon.jsx';
@@ -223,7 +223,7 @@ function IntroScreen({ introText, levelName, onProceed }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '12px', gap: '12px' }}>
       <div className="panel panel-gold" style={{ padding: '16px', textAlign: 'center', flexShrink: 0 }}>
-        <div className="title-large" style={{ fontSize: '20px' }}>Cathedral Level 1</div>
+        <div className="title-large" style={{ fontSize: '20px' }}>{levelName}</div>
         <div className="text-dim" style={{ fontSize: '11px', letterSpacing: '0.12em', marginTop: '4px' }}>
           {levelName?.toUpperCase()}
         </div>
@@ -321,7 +321,7 @@ export default function DungeonScreen() {
       {/* Compact header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
         <div className="title-small" style={{ fontSize: 'clamp(11px, 1.1vw, 14px)' }}>
-          Cathedral · {roomDepth}
+          L{dungeon.levelId} · {roomDepth}
         </div>
         <div style={{ display: 'flex', gap: '6px' }}>
           <button className="btn btn-ghost" style={{ padding: '5px 10px', fontSize: '13px' }}
@@ -350,18 +350,26 @@ export default function DungeonScreen() {
       )}
 
       {/* Level confirm */}
-      {levelConfirm && (
+      {levelConfirm && currentNode && (
         <div className="panel" style={{ padding: '12px', flexShrink: 0, boxShadow: '0 0 0 2px var(--border-gold)' }}>
-          <div className="title-small" style={{ marginBottom: '6px' }}>Descend to Level 2?</div>
+          <div className="title-small" style={{ marginBottom: '6px' }}>
+            Descend to Level {currentNode.targetLevel}?
+          </div>
           <div className="text-flavor" style={{ fontSize: '12px', marginBottom: '10px' }}>
-            The stairs lead deeper. No telling what awaits below.
+            The stairs lead deeper. Whatever waits below has not seen living prey in a long time.
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button className="btn btn-ghost btn-full" style={{ fontSize: '12px' }}
                     onClick={() => setLevelConfirm(false)}>Not yet</button>
             <button className="btn btn-primary btn-full" style={{ fontSize: '12px' }}
-                    onClick={() => setLevelConfirm(false)}>
-              Descend (coming soon)
+                    onClick={() => {
+                      const nextId   = currentNode.targetLevel;
+                      const newDungeon = generateDungeon(nextId, gameData.locations);
+                      dispatchAndSave({ type: 'SET_DUNGEON', payload: newDungeon });
+                      setLevelConfirm(false);
+                      setPhase('intro');
+                    }}>
+              Descend
             </button>
           </div>
         </div>

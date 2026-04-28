@@ -59,6 +59,70 @@
           "level":              "Stairs descend deeper into the cathedral's bowels."
         }
       }
+    },
+    {
+      "id": 2,
+      "name": "Cathedral Level 2",
+      "type": "dungeon3",
+      "depth": 4,
+      "additional_enemy_probability": 0.40,
+      "intro_texts": [
+        "The second level of the cathedral swallows you whole. The air is colder here — and older. Something watches from the dark.",
+        "Stone stairs groan beneath your boots as you descend. The torchlight barely reaches the walls. Whatever lives here has not seen the sun in centuries.",
+        "Deeper now. The stench of rot is overwhelming. The dead here have had far longer to fester.",
+        "The cathedral's second vaults stretch before you, their geometry wrong in ways you cannot name. Press on.",
+        "You descend into older darkness. The scratching sounds from the walls are closer here. More deliberate."
+      ],
+      "place_pool": [
+        { "type": "fight", "monster": "Rotting Carcass", "weight": 12, "cryptic_chance": 0.5 },
+        { "type": "fight", "monster": "Corpse Axe",      "weight": 11, "cryptic_chance": 0.5 },
+        { "type": "fight", "monster": "Devil Kin",       "weight": 10, "cryptic_chance": 0.4 },
+        { "type": "fight", "monster": "Vile Hunter",     "weight": 9,  "cryptic_chance": 0.5 },
+        { "type": "fight", "monster": "Ghoul",           "weight": 7,  "cryptic_chance": 0.55 },
+        { "type": "fight", "monster": "Dark One",        "weight": 6,  "cryptic_chance": 0.45 },
+        { "type": "fight", "monster": "Black Death",     "weight": 3,  "cryptic_chance": 0.7 },
+        { "type": "fight", "monster": "Burning Dead",    "weight": 2,  "cryptic_chance": 0.7 },
+        { "type": "nothing",                              "weight": 20, "cryptic_chance": 0.65 },
+        { "type": "level",  "target_level": 3,           "weight": 20, "cryptic_chance": 0.35 }
+      ],
+      "descriptions": {
+        "cryptic": {
+          "fight": [
+            "The smell of decay is stronger here than anywhere above.",
+            "Slow, deliberate movement echoes from beyond the threshold.",
+            "Something drags itself toward you from the dark.",
+            "The silence here is the wrong kind of silence.",
+            "Scratch marks on the floor lead into this passage.",
+            "A low gurgling carries through the stone walls.",
+            "The torchlight flickers violently near this corridor."
+          ],
+          "nothing": [
+            "A forgotten chamber, empty but not silent.",
+            "Dust thick enough to choke on. Nothing moves.",
+            "The passage appears undisturbed — for now.",
+            "Old bones line the walls, but nothing stirs.",
+            "Ancient carvings mark this room. Their meaning is lost."
+          ],
+          "level": [
+            "Steps descend into a blackness even your torch cannot pierce.",
+            "The air rising from below is colder still.",
+            "Ancient stairs lead to a deeper hell.",
+            "Whatever waits below has been waiting a long time."
+          ]
+        },
+        "visible": {
+          "Rotting Carcass": "A bloated undead horror lurches through the corridor, trailing decay.",
+          "Corpse Axe":      "A skeletal warrior raises its rusted axe as you approach.",
+          "Devil Kin":       "A seasoned fallen warrior watches you with calculating red eyes.",
+          "Vile Hunter":     "A lithe demon weaves between shadows, waiting to strike.",
+          "Ghoul":           "A hunched ghoul sniffs the air and fixes its gaze on you.",
+          "Dark One":        "The largest of the fallen demons blocks your path, silent and menacing.",
+          "Black Death":     "An enormous undead monstrosity fills the corridor. The air reeks of plague.",
+          "Burning Dead":    "A skeleton wreathed in hellfire charges toward you, screeching.",
+          "nothing":         "The chamber is empty — save for old bones and forgotten trinkets.",
+          "level":           "Stairs descend to the third level of the cathedral."
+        }
+      }
     }
   ]
 }
