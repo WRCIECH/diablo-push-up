@@ -280,6 +280,18 @@ export default function DungeonScreen() {
     }
   }, [currentNode, dispatchAndSave, setScreen]);
 
+  // Set dungeon entry point to a specific node type and mark ancestors visited
+  function enterAt(dungeon, nodeType) {
+    const entry = Object.values(dungeon.nodes).find(n => n.type === nodeType);
+    if (!entry) return;
+    dungeon.currentNodeId = entry.id;
+    let id = entry.id;
+    while (id) {
+      dungeon.nodes[id] = { ...dungeon.nodes[id], visited: true };
+      id = dungeon.nodes[id].parentId;
+    }
+  }
+
   function handleChestOpen(drop) {
     dispatchAndSave({ type: 'MARK_CHEST_LOOTED', payload: currentNode.id });
     if (drop?.type === 'gold') dispatchAndSave({ type: 'ADD_GOLD', payload: drop.amount });
@@ -295,7 +307,8 @@ export default function DungeonScreen() {
         levelName={dungeon.levelName}
         onProceed={() => {
           dispatchAndSave({ type: 'DUNGEON_INTRO_SHOWN' });
-          dispatchAndSave({ type: 'NAVIGATE_TO_NODE', payload: { nodeId: dungeon.rootId } });
+          // Navigate to current entry node (root on first entry, level_up when descending)
+          dispatchAndSave({ type: 'NAVIGATE_TO_NODE', payload: { nodeId: dungeon.currentNodeId } });
           setPhase('navigating');
         }}
       />
@@ -366,8 +379,10 @@ export default function DungeonScreen() {
                     onClick={() => setLevelConfirm(false)}>Not yet</button>
             <button className="btn btn-primary btn-full" style={{ fontSize: '12px' }}
                     onClick={() => {
-                      const nextId   = currentNode.targetLevel;
+                      const nextId     = currentNode.targetLevel;
                       const newDungeon = generateDungeon(nextId, gameData.locations);
+                      // Arrive at the level_up node (you came down from above)
+                      enterAt(newDungeon, 'level_up');
                       dispatchAndSave({ type: 'SET_DUNGEON', payload: newDungeon });
                       setLevelConfirm(false);
                       setPhase('intro');
@@ -400,9 +415,12 @@ export default function DungeonScreen() {
                       } else {
                         const prevId     = dungeon.levelId - 1;
                         const newDungeon = generateDungeon(prevId, gameData.locations);
+                        // Arrive at the level (down staircase) — you came up from below
+                        enterAt(newDungeon, 'level');
+                        newDungeon.introShown = true; // skip intro when ascending
                         dispatchAndSave({ type: 'SET_DUNGEON', payload: newDungeon });
                         setLevelUpConfirm(false);
-                        setPhase('intro');
+                        setPhase('navigating');
                       }
                     }}>
               Ascend
