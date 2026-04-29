@@ -180,8 +180,10 @@ export default function DungeonScreen() {
                     onClick={() => {
                       const nextId     = currentNode.targetLevel;
                       const newDungeon = generateDungeon(nextId, gameData.locations);
-                      // Arrive at the level_up node (you came down from above)
-                      enterAt(newDungeon, 'level_up');
+                      // Root IS the level_up node — just mark it visited
+                      newDungeon.nodes[newDungeon.rootId] = {
+                        ...newDungeon.nodes[newDungeon.rootId], visited: true,
+                      };
                       dispatchAndSave({ type: 'SET_DUNGEON', payload: newDungeon });
                       setLevelConfirm(false);
                       setPhase('intro');

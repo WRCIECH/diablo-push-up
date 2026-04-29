@@ -22,7 +22,6 @@ export function generateDungeon(levelId, locationsData) {
 
   let counter = 0;
   let levelPlaced   = false;  // exactly one staircase down per dungeon
-  let levelUpPlaced = false;  // exactly one staircase up per dungeon
   let butcherPlaced = false;  // The Butcher appears at most once
   const nodes = {};
   const nothingEntry = place_pool.find(p => p.type === 'nothing') ?? place_pool[0];
@@ -33,21 +32,20 @@ export function generateDungeon(levelId, locationsData) {
 
     let node;
     if (isRoot) {
+      // Root = where you arrive when entering this level.
+      // Level 1 entrance comes from Tristram; level 2+ comes from the stairs above.
       node = {
-        id, depth: 0, type: 'entrance',
+        id, depth: 0,
+        type: levelId > 1 ? 'level_up' : 'entrance',
         parentId: null, childrenIds: [],
         visited: false, defeated: false,
       };
     } else {
       let place = weightedPick(place_pool);
-      // Enforce exactly one staircase of each direction per dungeon
+      // Enforce exactly one staircase down per dungeon
       if (place.type === 'level') {
         if (levelPlaced) place = nothingEntry;
         else levelPlaced = true;
-      }
-      if (place.type === 'level_up') {
-        if (levelUpPlaced) place = nothingEntry;
-        else levelUpPlaced = true;
       }
       if (place.type === 'butcher') {
         if (butcherPlaced) place = nothingEntry;
