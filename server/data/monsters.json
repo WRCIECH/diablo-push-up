@@ -1,366 +1,797 @@
 [
   {
-    "name": "The Butcher",
-    "type": "Demon",
-    "dlvl": [2, 2],
-    "vitality": 40,
-    "damage": [2, 5],
-    "ac": 40,
-    "toHit": 50,
-    "exp": 800,
-    "gold_drop": [60, 200],
-    "push_up_types": ["diamond", "standard", "standard"],
-    "description": "AHHH... fresh meat! The Butcher's massive frame fills the doorway. The walls are painted red. His cleaver drips. There is no negotiating with this."
-  },
-  {
     "name": "Fallen One (spear)",
     "type": "Animal",
-    "dlvl": [1, 2],
+    "dlvl": [
+      1,
+      2
+    ],
     "vitality": 2,
-    "damage": [1, 3],
+    "damage": [
+      1,
+      3
+    ],
     "ac": 0,
     "toHit": 15,
     "exp": 46,
-    "gold_drop": [1, 10],
-    "push_up_types": ["wall", "wall", "incline_high"],
+    "gold_drop": [
+      1,
+      10
+    ],
+    "push_up_types": [
+      "wall",
+      "wall",
+      "incline_high"
+    ],
     "description": "A scrawny demon imp wielding a rusted spear. Weak and cowardly but dangerous in numbers."
-  },
-  {
-    "name": "Carver",
-    "type": "Animal",
-    "dlvl": [2, 4],
-    "vitality": 4,
-    "damage": [2, 5],
-    "ac": 5,
-    "toHit": 20,
-    "exp": 80,
-    "gold_drop": [1, 15],
-    "push_up_types": ["wall", "wall", "incline_high", "incline_high", "incline_low"],
-    "description": "A bolder, stockier fallen demon that charges with surprising ferocity. Quick to rally its lesser kin."
-  },
-  {
-    "name": "Devil Kin",
-    "type": "Animal",
-    "dlvl": [3, 5],
-    "vitality": 6,
-    "damage": [2, 6],
-    "ac": 10,
-    "toHit": 22,
-    "exp": 110,
-    "gold_drop": [2, 20],
-    "push_up_types": ["wall", "incline_high", "incline_high", "incline_low", "incline_low"],
-    "description": "A seasoned fallen warrior smarter and harder to kill than its lesser kin. It commands from the back of the pack."
-  },
-  {
-    "name": "Dark One",
-    "type": "Animal",
-    "dlvl": [4, 6],
-    "vitality": 8,
-    "damage": [3, 8],
-    "ac": 15,
-    "toHit": 25,
-    "exp": 155,
-    "gold_drop": [3, 25],
-    "push_up_types": ["incline_high", "incline_high", "incline_low", "incline_low", "incline_low"],
-    "description": "The apex of the fallen demon lineage. Its dark eyes burn with genuine malice and cunning."
-  },
-  {
-    "name": "Scavenger",
-    "type": "Animal",
-    "dlvl": [2, 4],
-    "vitality": 5,
-    "damage": [2, 6],
-    "ac": 8,
-    "toHit": 20,
-    "exp": 85,
-    "gold_drop": [1, 16],
-    "push_up_types": ["wall", "wall", "incline_high", "incline_high", "incline_low"],
-    "description": "A four-legged carrion beast drawn by the smell of death. Fast and vicious when cornered."
   },
   {
     "name": "Zombie",
     "type": "Undead",
-    "dlvl": [1, 2],
+    "dlvl": [
+      1,
+      2
+    ],
     "vitality": 5,
-    "damage": [2, 5],
+    "damage": [
+      2,
+      5
+    ],
     "ac": 5,
     "toHit": 10,
     "exp": 54,
-    "gold_drop": [1, 16],
-    "push_up_types": ["standard", "standard", "standard", "wide", "knee"],
+    "gold_drop": [
+      1,
+      16
+    ],
+    "push_up_types": [
+      "standard",
+      "standard",
+      "standard",
+      "wide",
+      "knee"
+    ],
     "description": "A shambling undead corpse, slow but relentless. Rotting flesh and hollow eyes."
-  },
-  {
-    "name": "Ghoul",
-    "type": "Undead",
-    "dlvl": [2, 4],
-    "vitality": 9,
-    "damage": [3, 10],
-    "ac": 10,
-    "toHit": 10,
-    "exp": 78,
-    "gold_drop": [2, 22],
-    "push_up_types": ["standard", "standard", "standard", "wide", "knee"],
-    "description": "A hunched ghoul with jagged claws. Stronger than a zombie and harder to put down."
-  },
-  {
-    "name": "Rotting Carcass",
-    "type": "Undead",
-    "dlvl": [3, 5],
-    "vitality": 12,
-    "damage": [4, 12],
-    "ac": 10,
-    "toHit": 15,
-    "exp": 115,
-    "gold_drop": [3, 28],
-    "push_up_types": ["standard", "standard", "wide", "wide", "parallette_standard", "knee"],
-    "description": "A bloated, decomposing horror barely holding itself together. Each step leaves a trail of rot."
   },
   {
     "name": "Skeleton",
     "type": "Undead",
-    "dlvl": [1, 2],
+    "dlvl": [
+      1,
+      2
+    ],
     "vitality": 3,
-    "damage": [1, 4],
+    "damage": [
+      1,
+      4
+    ],
     "ac": 0,
     "toHit": 20,
     "exp": 64,
-    "gold_drop": [1, 14],
-    "push_up_types": ["close_grip", "close_grip", "close_grip", "diamond", "standard"],
+    "gold_drop": [
+      1,
+      14
+    ],
+    "push_up_types": [
+      "close_grip",
+      "close_grip",
+      "close_grip",
+      "diamond",
+      "standard"
+    ],
     "description": "An animated skeleton warrior. Low on life but strikes with alarming precision."
-  },
-  {
-    "name": "Corpse Axe",
-    "type": "Undead",
-    "dlvl": [3, 5],
-    "vitality": 7,
-    "damage": [3, 8],
-    "ac": 5,
-    "toHit": 30,
-    "exp": 105,
-    "gold_drop": [2, 20],
-    "push_up_types": ["close_grip", "close_grip", "close_grip", "diamond", "parallette_close_grip"],
-    "description": "A skeletal warrior armed with a rusted axe. Fast, precise, and nearly impossible to ignore."
   },
   {
     "name": "Fallen One (sword)",
     "type": "Demon",
-    "dlvl": [1, 3],
+    "dlvl": [
+      1,
+      3
+    ],
     "vitality": 3,
-    "damage": [2, 6],
+    "damage": [
+      2,
+      6
+    ],
     "ac": 10,
     "toHit": 20,
     "exp": 70,
-    "gold_drop": [1, 12],
-    "push_up_types": ["pike", "staggered", "staggered", "standard", "knee"],
+    "gold_drop": [
+      1,
+      12
+    ],
+    "push_up_types": [
+      "pike",
+      "staggered",
+      "staggered",
+      "standard",
+      "knee"
+    ],
     "description": "A small demon clutching a chipped sword, shrieking battle cries in an unknown tongue."
+  },
+  {
+    "name": "The Butcher",
+    "type": "Demon",
+    "dlvl": [
+      2,
+      2
+    ],
+    "vitality": 40,
+    "damage": [
+      2,
+      5
+    ],
+    "ac": 40,
+    "toHit": 50,
+    "exp": 800,
+    "gold_drop": [
+      60,
+      200
+    ],
+    "push_up_types": [
+      "diamond",
+      "standard",
+      "standard"
+    ],
+    "description": "AHHH... fresh meat! The Butcher's massive frame fills the doorway. The walls are painted red. His cleaver drips. There is no negotiating with this."
+  },
+  {
+    "name": "Carver",
+    "type": "Animal",
+    "dlvl": [
+      2,
+      4
+    ],
+    "vitality": 4,
+    "damage": [
+      2,
+      5
+    ],
+    "ac": 5,
+    "toHit": 20,
+    "exp": 80,
+    "gold_drop": [
+      1,
+      15
+    ],
+    "push_up_types": [
+      "wall",
+      "wall",
+      "incline_high",
+      "incline_high",
+      "incline_low"
+    ],
+    "description": "A bolder, stockier fallen demon that charges with surprising ferocity. Quick to rally its lesser kin."
+  },
+  {
+    "name": "Scavenger",
+    "type": "Animal",
+    "dlvl": [
+      2,
+      4
+    ],
+    "vitality": 5,
+    "damage": [
+      2,
+      6
+    ],
+    "ac": 8,
+    "toHit": 20,
+    "exp": 85,
+    "gold_drop": [
+      1,
+      16
+    ],
+    "push_up_types": [
+      "wall",
+      "wall",
+      "incline_high",
+      "incline_high",
+      "incline_low"
+    ],
+    "description": "A four-legged carrion beast drawn by the smell of death. Fast and vicious when cornered."
+  },
+  {
+    "name": "Ghoul",
+    "type": "Undead",
+    "dlvl": [
+      2,
+      4
+    ],
+    "vitality": 9,
+    "damage": [
+      3,
+      10
+    ],
+    "ac": 10,
+    "toHit": 10,
+    "exp": 78,
+    "gold_drop": [
+      2,
+      22
+    ],
+    "push_up_types": [
+      "standard",
+      "standard",
+      "standard",
+      "wide",
+      "knee"
+    ],
+    "description": "A hunched ghoul with jagged claws. Stronger than a zombie and harder to put down."
+  },
+  {
+    "name": "Devil Kin",
+    "type": "Animal",
+    "dlvl": [
+      3,
+      5
+    ],
+    "vitality": 6,
+    "damage": [
+      2,
+      6
+    ],
+    "ac": 10,
+    "toHit": 22,
+    "exp": 110,
+    "gold_drop": [
+      2,
+      20
+    ],
+    "push_up_types": [
+      "wall",
+      "incline_high",
+      "incline_high",
+      "incline_low",
+      "incline_low"
+    ],
+    "description": "A seasoned fallen warrior smarter and harder to kill than its lesser kin. It commands from the back of the pack."
+  },
+  {
+    "name": "Rotting Carcass",
+    "type": "Undead",
+    "dlvl": [
+      3,
+      5
+    ],
+    "vitality": 12,
+    "damage": [
+      4,
+      12
+    ],
+    "ac": 10,
+    "toHit": 15,
+    "exp": 115,
+    "gold_drop": [
+      3,
+      28
+    ],
+    "push_up_types": [
+      "standard",
+      "standard",
+      "wide",
+      "wide",
+      "parallette_standard",
+      "knee"
+    ],
+    "description": "A bloated, decomposing horror barely holding itself together. Each step leaves a trail of rot."
+  },
+  {
+    "name": "Corpse Axe",
+    "type": "Undead",
+    "dlvl": [
+      3,
+      5
+    ],
+    "vitality": 7,
+    "damage": [
+      3,
+      8
+    ],
+    "ac": 5,
+    "toHit": 30,
+    "exp": 105,
+    "gold_drop": [
+      2,
+      20
+    ],
+    "push_up_types": [
+      "close_grip",
+      "close_grip",
+      "close_grip",
+      "diamond",
+      "parallette_close_grip"
+    ],
+    "description": "A skeletal warrior armed with a rusted axe. Fast, precise, and nearly impossible to ignore."
   },
   {
     "name": "Vile Hunter",
     "type": "Demon",
-    "dlvl": [3, 6],
+    "dlvl": [
+      3,
+      6
+    ],
     "vitality": 8,
-    "damage": [4, 10],
+    "damage": [
+      4,
+      10
+    ],
     "ac": 20,
     "toHit": 28,
     "exp": 150,
-    "gold_drop": [3, 24],
-    "push_up_types": ["pike", "staggered", "staggered", "t_pushup", "spiderman"],
+    "gold_drop": [
+      3,
+      24
+    ],
+    "push_up_types": [
+      "pike",
+      "staggered",
+      "staggered",
+      "t_pushup",
+      "spiderman"
+    ],
     "description": "A lithe demon that weaves between shadows. Its erratic movements make it maddening to fight."
+  },
+  {
+    "name": "Dark One",
+    "type": "Animal",
+    "dlvl": [
+      4,
+      6
+    ],
+    "vitality": 8,
+    "damage": [
+      3,
+      8
+    ],
+    "ac": 15,
+    "toHit": 25,
+    "exp": 155,
+    "gold_drop": [
+      3,
+      25
+    ],
+    "push_up_types": [
+      "incline_high",
+      "incline_high",
+      "incline_low",
+      "incline_low",
+      "incline_low"
+    ],
+    "description": "The apex of the fallen demon lineage. Its dark eyes burn with genuine malice and cunning."
   },
   {
     "name": "Black Death",
     "type": "Undead",
-    "dlvl": [5, 7],
+    "dlvl": [
+      5,
+      7
+    ],
     "vitality": 16,
-    "damage": [6, 16],
+    "damage": [
+      6,
+      16
+    ],
     "ac": 15,
     "toHit": 15,
     "exp": 210,
-    "gold_drop": [6, 38],
-    "push_up_types": ["standard", "standard", "wide", "wide", "parallette_standard", "knee"],
+    "gold_drop": [
+      6,
+      38
+    ],
+    "push_up_types": [
+      "standard",
+      "standard",
+      "wide",
+      "wide",
+      "parallette_standard",
+      "knee"
+    ],
     "description": "A massive undead brute reeking of plague. Its very touch drains the life from a man."
   },
   {
     "name": "Burning Dead",
     "type": "Undead",
-    "dlvl": [5, 7],
+    "dlvl": [
+      5,
+      7
+    ],
     "vitality": 10,
-    "damage": [4, 10],
+    "damage": [
+      4,
+      10
+    ],
     "ac": 10,
     "toHit": 38,
     "exp": 190,
-    "gold_drop": [4, 30],
-    "push_up_types": ["close_grip", "close_grip", "diamond", "diamond", "parallette_close_grip"],
+    "gold_drop": [
+      4,
+      30
+    ],
+    "push_up_types": [
+      "close_grip",
+      "close_grip",
+      "diamond",
+      "diamond",
+      "parallette_close_grip"
+    ],
     "description": "A skeleton wreathed in hellfire. It moves with terrifying speed, its bones glowing molten orange."
   },
   {
-    "name": "Horror",
+    "name": "Wraith",
     "type": "Undead",
-    "dlvl": [7, 9],
-    "vitality": 14,
-    "damage": [6, 14],
-    "ac": 15,
-    "toHit": 45,
-    "exp": 295,
-    "gold_drop": [7, 44],
-    "push_up_types": ["close_grip", "close_grip", "diamond", "diamond", "parallette_close_grip", "parallette_close_grip"],
-    "description": "A charred skeletal abomination that screeches as it charges. Faster and deadlier than any Burning Dead."
+    "dlvl": [
+      5,
+      8
+    ],
+    "vitality": 10,
+    "damage": [
+      5,
+      14
+    ],
+    "ac": 28,
+    "toHit": 22,
+    "exp": 255,
+    "gold_drop": [
+      6,
+      40
+    ],
+    "push_up_types": [
+      "pike_deep",
+      "pike_deep",
+      "pike_deep",
+      "diamond",
+      "diamond"
+    ],
+    "description": "A translucent spectre that phases through walls. Its arcane strikes bypass armour entirely."
+  },
+  {
+    "name": "Goat Man",
+    "type": "Demon",
+    "dlvl": [
+      5,
+      9
+    ],
+    "vitality": 16,
+    "damage": [
+      12,
+      26
+    ],
+    "ac": 32,
+    "toHit": 42,
+    "exp": 500,
+    "gold_drop": [
+      14,
+      70
+    ],
+    "push_up_types": [
+      "clap",
+      "clap",
+      "diamond",
+      "diamond",
+      "diamond",
+      "close_grip"
+    ],
+    "description": "A horned demonic warrior built like a battering ram. Its charge can send a man flying across the cavern."
   },
   {
     "name": "Stone Golem",
     "type": "Animal",
-    "dlvl": [6, 9],
+    "dlvl": [
+      6,
+      9
+    ],
     "vitality": 18,
-    "damage": [10, 22],
+    "damage": [
+      10,
+      22
+    ],
     "ac": 60,
     "toHit": 8,
     "exp": 370,
-    "gold_drop": [10, 55],
-    "push_up_types": ["decline_low", "decline_low", "decline_low", "decline_high", "decline_high"],
+    "gold_drop": [
+      10,
+      55
+    ],
+    "push_up_types": [
+      "decline_low",
+      "decline_low",
+      "decline_low",
+      "decline_high",
+      "decline_high"
+    ],
     "description": "A massive animated statue of ancient stone. Nearly impervious to damage — patience and raw strength are the only answer."
   },
   {
     "name": "Doom Guard",
     "type": "Demon",
-    "dlvl": [6, 9],
+    "dlvl": [
+      6,
+      9
+    ],
     "vitality": 14,
-    "damage": [7, 18],
+    "damage": [
+      7,
+      18
+    ],
     "ac": 38,
     "toHit": 38,
     "exp": 340,
-    "gold_drop": [9, 50],
-    "push_up_types": ["pike", "staggered", "staggered", "t_pushup", "spiderman", "spiderman"],
+    "gold_drop": [
+      9,
+      50
+    ],
+    "push_up_types": [
+      "pike",
+      "staggered",
+      "staggered",
+      "t_pushup",
+      "spiderman",
+      "spiderman"
+    ],
     "description": "An armoured demon guardian wielding twin blades. Its relentless assault leaves no moment to breathe."
   },
   {
-    "name": "Wraith",
+    "name": "Horror",
     "type": "Undead",
-    "dlvl": [5, 8],
-    "vitality": 10,
-    "damage": [5, 14],
-    "ac": 28,
-    "toHit": 22,
-    "exp": 255,
-    "gold_drop": [6, 40],
-    "push_up_types": ["pike_deep", "pike_deep", "pike_deep", "diamond", "diamond"],
-    "description": "A translucent spectre that phases through walls. Its arcane strikes bypass armour entirely."
+    "dlvl": [
+      7,
+      9
+    ],
+    "vitality": 14,
+    "damage": [
+      6,
+      14
+    ],
+    "ac": 15,
+    "toHit": 45,
+    "exp": 295,
+    "gold_drop": [
+      7,
+      44
+    ],
+    "push_up_types": [
+      "close_grip",
+      "close_grip",
+      "diamond",
+      "diamond",
+      "parallette_close_grip",
+      "parallette_close_grip"
+    ],
+    "description": "A charred skeletal abomination that screeches as it charges. Faster and deadlier than any Burning Dead."
   },
   {
     "name": "Shade",
     "type": "Undead",
-    "dlvl": [7, 10],
+    "dlvl": [
+      7,
+      10
+    ],
     "vitality": 12,
-    "damage": [8, 20],
+    "damage": [
+      8,
+      20
+    ],
     "ac": 35,
     "toHit": 25,
     "exp": 420,
-    "gold_drop": [10, 58],
-    "push_up_types": ["pike_deep", "pike_deep", "hspu_wall", "diamond", "diamond", "diamond"],
+    "gold_drop": [
+      10,
+      58
+    ],
+    "push_up_types": [
+      "pike_deep",
+      "pike_deep",
+      "hspu_wall",
+      "diamond",
+      "diamond",
+      "diamond"
+    ],
     "description": "A shadow given terrible purpose. It strikes from angles that shouldn't exist, draining warmth as it passes."
-  },
-  {
-    "name": "Goat Man",
-    "type": "Demon",
-    "dlvl": [5, 9],
-    "vitality": 16,
-    "damage": [12, 26],
-    "ac": 32,
-    "toHit": 42,
-    "exp": 500,
-    "gold_drop": [14, 70],
-    "push_up_types": ["clap", "clap", "diamond", "diamond", "diamond", "close_grip"],
-    "description": "A horned demonic warrior built like a battering ram. Its charge can send a man flying across the cavern."
   },
   {
     "name": "Overlord",
     "type": "Demon",
-    "dlvl": [9, 12],
+    "dlvl": [
+      9,
+      12
+    ],
     "vitality": 20,
-    "damage": [18, 38],
+    "damage": [
+      18,
+      38
+    ],
     "ac": 42,
     "toHit": 48,
     "exp": 950,
-    "gold_drop": [20, 100],
-    "push_up_types": ["clap", "clap", "double_clap", "diamond", "diamond", "close_grip"],
+    "gold_drop": [
+      20,
+      100
+    ],
+    "push_up_types": [
+      "clap",
+      "clap",
+      "double_clap",
+      "diamond",
+      "diamond",
+      "close_grip"
+    ],
     "description": "A mountain of demonic muscle and fury. Its blows shake the cavern floor and crack the stone walls."
   },
   {
     "name": "Lich",
     "type": "Undead",
-    "dlvl": [9, 12],
+    "dlvl": [
+      9,
+      12
+    ],
     "vitality": 14,
-    "damage": [14, 32],
+    "damage": [
+      14,
+      32
+    ],
     "ac": 48,
     "toHit": 28,
     "exp": 740,
-    "gold_drop": [18, 88],
-    "push_up_types": ["hspu_wall", "pike_deep", "pike_deep", "diamond", "diamond", "diamond"],
+    "gold_drop": [
+      18,
+      88
+    ],
+    "push_up_types": [
+      "hspu_wall",
+      "pike_deep",
+      "pike_deep",
+      "diamond",
+      "diamond",
+      "diamond"
+    ],
     "description": "An ancient sorcerer-king risen from death. Its dark magic tears at mind and body alike."
   },
   {
     "name": "Succubus",
     "type": "Demon",
-    "dlvl": [9, 12],
+    "dlvl": [
+      9,
+      12
+    ],
     "vitality": 12,
-    "damage": [12, 28],
+    "damage": [
+      12,
+      28
+    ],
     "ac": 40,
     "toHit": 32,
     "exp": 680,
-    "gold_drop": [15, 80],
-    "push_up_types": ["hspu_wall", "pike_deep", "pike_deep", "pike_deep", "diamond", "diamond"],
+    "gold_drop": [
+      15,
+      80
+    ],
+    "push_up_types": [
+      "hspu_wall",
+      "pike_deep",
+      "pike_deep",
+      "pike_deep",
+      "diamond",
+      "diamond"
+    ],
     "description": "A seductive demon of terrible power. Its ranged attacks strike before you even see it move."
   },
   {
     "name": "Iron Golem",
     "type": "Animal",
-    "dlvl": [9, 12],
+    "dlvl": [
+      9,
+      12
+    ],
     "vitality": 20,
-    "damage": [20, 42],
+    "damage": [
+      20,
+      42
+    ],
     "ac": 82,
     "toHit": 8,
     "exp": 850,
-    "gold_drop": [22, 110],
-    "push_up_types": ["decline_high", "decline_high", "decline_high", "decline_low", "decline_low"],
+    "gold_drop": [
+      22,
+      110
+    ],
+    "push_up_types": [
+      "decline_high",
+      "decline_high",
+      "decline_high",
+      "decline_low",
+      "decline_low"
+    ],
     "description": "A towering automaton of forged hellish iron. Each blow hammers like a siege weapon."
   },
   {
     "name": "Balrog",
     "type": "Demon",
-    "dlvl": [13, 15],
+    "dlvl": [
+      13,
+      15
+    ],
     "vitality": 22,
-    "damage": [26, 58],
+    "damage": [
+      26,
+      58
+    ],
     "ac": 68,
     "toHit": 62,
     "exp": 1900,
-    "gold_drop": [35, 160],
-    "push_up_types": ["clap", "clap", "double_clap", "diamond", "diamond", "close_grip", "close_grip"],
+    "gold_drop": [
+      35,
+      160
+    ],
+    "push_up_types": [
+      "clap",
+      "clap",
+      "double_clap",
+      "diamond",
+      "diamond",
+      "close_grip",
+      "close_grip"
+    ],
     "description": "A demon of shadow and flame. The floor cracks beneath its hooves. The air itself ignites in its wake."
   },
   {
     "name": "Advocate",
     "type": "Demon",
-    "dlvl": [13, 16],
+    "dlvl": [
+      13,
+      16
+    ],
     "vitality": 16,
-    "damage": [30, 64],
+    "damage": [
+      30,
+      64
+    ],
     "ac": 72,
     "toHit": 58,
     "exp": 2500,
-    "gold_drop": [45, 220],
-    "push_up_types": ["oap", "tuck_planche", "fingertip", "diamond", "diamond", "close_grip", "close_grip"],
+    "gold_drop": [
+      45,
+      220
+    ],
+    "push_up_types": [
+      "oap",
+      "tuck_planche",
+      "fingertip",
+      "diamond",
+      "diamond",
+      "close_grip",
+      "close_grip"
+    ],
     "description": "A supremely powerful demon sorcerer and judge of souls. Ancient beyond reckoning, deadly beyond measure."
   },
   {
     "name": "Blood Knight",
     "type": "Demon",
-    "dlvl": [15, 16],
+    "dlvl": [
+      15,
+      16
+    ],
     "vitality": 18,
-    "damage": [38, 76],
+    "damage": [
+      38,
+      76
+    ],
     "ac": 88,
     "toHit": 72,
     "exp": 3400,
-    "gold_drop": [60, 280],
-    "push_up_types": ["full_planche", "tuck_planche", "oap", "fingertip", "diamond", "diamond", "close_grip"],
+    "gold_drop": [
+      60,
+      280
+    ],
+    "push_up_types": [
+      "full_planche",
+      "tuck_planche",
+      "oap",
+      "fingertip",
+      "diamond",
+      "diamond",
+      "close_grip"
+    ],
     "description": "Hell's elite warrior, clad in armour forged from the bones of fallen heroes. The pinnacle of demonic martial power."
   }
 ]
