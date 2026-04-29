@@ -68,7 +68,7 @@ export function rollChestLoot(itemsData) {
   if (result === 'nothing') return null;
 
   if (result === 'gold') {
-    return { type: 'gold', amount: rollBetween(10, 80) };
+    return { type: 'gold', amount: rollBetween(1, 80) };
   }
 
   if (result === 'normal') {
