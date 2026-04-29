@@ -262,15 +262,19 @@ function GearPanel({ player, onEquip, onUnequip, onSell, onUse, onIdentify, inDu
       <div className="panel" style={{ padding: '12px', marginBottom: '10px' }}>
         <div className="title-small" style={{ marginBottom: '10px' }}>Equipped</div>
         <div className="divider" style={{ marginBottom: '12px' }}/>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '10px' }}>
-          {['helm', 'armor', 'weapon', 'shield'].map(slot => (
-            <EquipSlot key={slot} slot={slot} item={player.equipment[slot]} onSelect={setSelected}/>
-          ))}
-        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
-          {['ring1', 'ring2', 'talisman'].map(slot => (
-            <EquipSlot key={slot} slot={slot} item={player.equipment?.[slot] ?? null} onSelect={setSelected}/>
-          ))}
+          {/* Row 1: helm — empty — talisman */}
+          <EquipSlot slot="helm"     item={player.equipment.helm}              onSelect={setSelected}/>
+          <div/>
+          <EquipSlot slot="talisman" item={player.equipment?.talisman ?? null} onSelect={setSelected}/>
+          {/* Row 2: weapon — armor — shield */}
+          <EquipSlot slot="weapon"   item={player.equipment.weapon}            onSelect={setSelected}/>
+          <EquipSlot slot="armor"    item={player.equipment.armor}             onSelect={setSelected}/>
+          <EquipSlot slot="shield"   item={player.equipment.shield}            onSelect={setSelected}/>
+          {/* Row 3: empty — ring1 — ring2 */}
+          <div/>
+          <EquipSlot slot="ring1"    item={player.equipment?.ring1 ?? null}    onSelect={setSelected}/>
+          <EquipSlot slot="ring2"    item={player.equipment?.ring2 ?? null}    onSelect={setSelected}/>
         </div>
       </div>
 
