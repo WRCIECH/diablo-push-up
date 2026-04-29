@@ -334,7 +334,11 @@ export default function LootScreen() {
             animation: opened ? 'none' : 'corpse-pulse 2s ease-in-out infinite',
           }}
         >
-          {monsters.map(m => <CorpsePortrait key={m.name} monster={m} size={monsters.length > 1 ? 88 : 120}/>)}
+          {monsters.map(m => <CorpsePortrait key={m.name} monster={m} size={
+            monsters.length === 1 ? 120 :
+            monsters.length <= 3  ? 88  :
+            Math.floor(320 / monsters.length)
+          }/>)}
         </div>
 
         {!opened ? (
