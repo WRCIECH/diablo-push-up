@@ -3,13 +3,13 @@
     "name": "The Butcher",
     "type": "Demon",
     "dlvl": [2, 2],
-    "vitality": 20,
+    "vitality": 40,
     "damage": [2, 5],
     "ac": 40,
     "toHit": 50,
     "exp": 800,
     "gold_drop": [60, 200],
-    "push_up_types": ["clap", "clap", "archer", "diamond", "diamond", "close_grip", "wide"],
+    "push_up_types": ["diamond", "standard", "standard"],
     "description": "AHHH... fresh meat! The Butcher's massive frame fills the doorway. The walls are painted red. His cleaver drips. There is no negotiating with this."
   },
   {
