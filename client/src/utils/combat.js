@@ -34,13 +34,24 @@ function pickFromWeightedPool(pool) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-// Map a reduced difficulty number back to the canonical push-up at that level.
-// Lower-difficulty push-ups always appear first in push_ups.json.
-function diffToPushUp(difficulty, pushUpData) {
+// Find the easiest step down for a given push-up:
+// 1. Same category, difficulty < current → pick the highest among those
+// 2. Fallback: any push-up at exactly difficulty - 1
+// Difficulty 1 push-ups cannot be eased (caller must check).
+function easeDown(pu, pushUpData) {
+  const sameCatLower = pushUpData.filter(
+    p => p.category === pu.category && p.difficulty < pu.difficulty
+  );
+  if (sameCatLower.length > 0) {
+    const maxDiff = Math.max(...sameCatLower.map(p => p.difficulty));
+    return sameCatLower.find(p => p.difficulty === maxDiff);
+  }
+  // Fallback: first push-up in the array at exactly difficulty - 1
+  const targetDiff = pu.difficulty - 1;
   return (
-    pushUpData.find(p => p.difficulty === difficulty) ||
-    pushUpData.find(p => p.difficulty <= difficulty)  ||
-    pushUpData[0]
+    pushUpData.find(p => p.difficulty === targetDiff) ||
+    pushUpData.find(p => p.difficulty < pu.difficulty) ||
+    pu
   );
 }
 
@@ -115,10 +126,10 @@ export function calculateFight(player, monsters, pushUpData) {
   );
 
   const easedPool = rawPool.map(pu => {
+    if (pu.difficulty <= 1) return { ...pu }; // difficulty 1 cannot be eased
     if (Math.random() < easeChance) {
-      const newDiff   = Math.max(1, pu.difficulty - 1);
-      const canonical = diffToPushUp(newDiff, pushUpData);
-      return { ...canonical, _originalName: pu.name };
+      const eased = easeDown(pu, pushUpData);
+      return { ...eased, _originalName: pu.name };
     }
     return { ...pu };
   });
