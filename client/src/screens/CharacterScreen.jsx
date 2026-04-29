@@ -263,9 +263,9 @@ function GearPanel({ player, onEquip, onUnequip, onSell, onUse, onIdentify, inDu
         <div className="title-small" style={{ marginBottom: '10px' }}>Equipped</div>
         <div className="divider" style={{ marginBottom: '12px' }}/>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
-          {/* Row 1: helm — empty — talisman */}
-          <EquipSlot slot="helm"     item={player.equipment.helm}              onSelect={setSelected}/>
+          {/* Row 1: empty — helm — talisman */}
           <div/>
+          <EquipSlot slot="helm"     item={player.equipment.helm}              onSelect={setSelected}/>
           <EquipSlot slot="talisman" item={player.equipment?.talisman ?? null} onSelect={setSelected}/>
           {/* Row 2: weapon — armor — shield */}
           <EquipSlot slot="weapon"   item={player.equipment.weapon}            onSelect={setSelected}/>
