@@ -113,11 +113,10 @@ export function calculateFight(player, monsters, pushUpData) {
     (40 + Math.floor(stats.strength / 2) + Math.floor(weaponAvgDamage)) / 100,
     C.HIT_CHANCE_MIN, C.HIT_CHANCE_MAX
   );
-  const easeAmount = Math.max(1, Math.floor(weaponAvgDamage / 2));
 
   const easedPool = rawPool.map(pu => {
     if (Math.random() < easeChance) {
-      const newDiff   = Math.max(1, pu.difficulty - easeAmount);
+      const newDiff   = Math.max(1, pu.difficulty - 1);
       const canonical = diffToPushUp(newDiff, pushUpData);
       return { ...canonical, _originalName: pu.name };
     }
@@ -144,7 +143,6 @@ export function calculateFight(player, monsters, pushUpData) {
     weaponDamage,
     weaponAvgDamage,
     easeChance,
-    easeAmount,
     skipChance,
     playerToHitPct,
     playerAC,

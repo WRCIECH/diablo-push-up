@@ -503,13 +503,11 @@ export default function FightPreScreen() {
             <div className="title-small" style={{ marginBottom: '8px' }}>Combat Calculation</div>
             <div className="divider" style={{ marginBottom: '8px' }} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px' }}>
-              <StatRow label="Ease chance (STR)" value={pct(fightData.easeChance)}       color="var(--green-text)" />
-              <StatRow label="Ease amount"        value={`−${fightData.easeAmount} diff`} />
-              <StatRow label="Skip chance (DEX)"  value={pct(fightData.skipChance)}       color="var(--green-text)" />
+              <StatRow label="Ease chance (STR)" value={pct(fightData.easeChance)} color="var(--green-text)" />
+              <StatRow label="Skip chance (DEX)" value={pct(fightData.skipChance)} color="var(--green-text)" />
               {fightData.monsterStats.map(ms => (
                 <StatRow key={ms.name} label={`${ms.name} hit%`} value={pct(ms.hitChance)} color="var(--red-text)" />
               ))}
-              <StatRow label="Player AC"  value={fightData.playerAC} />
               <StatRow label="Time lost"  value={`-${fightData.baseTimeReduction}s`}
                         color={fightData.baseTimeReduction > 0 ? 'var(--red-text)' : 'var(--text-dim)'} />
             </div>

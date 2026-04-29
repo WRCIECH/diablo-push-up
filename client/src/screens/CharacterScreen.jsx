@@ -346,7 +346,6 @@ function StatsPanel({ player, canAllocate, onAllocate }) {
   const easeChancePct  = Math.round(Math.min(0.95, Math.max(0.05,
     (40 + Math.floor(eff.strength / 2) + Math.floor(weaponAvg)) / 100
   )) * 100);
-  const easeAmount     = Math.max(1, Math.floor(weaponAvg / 2));
   const buffer         = eff.vitality * C.VITALITY_TO_SECONDS;
 
   return (
@@ -398,7 +397,7 @@ function StatsPanel({ player, canAllocate, onAllocate }) {
         <div className="title-small" style={{ marginBottom: '8px' }}>Combat</div>
         <div className="divider" style={{ marginBottom: '10px' }}/>
         <CombatRow label="Hit Resist"   value={ac}/>
-        <CombatRow label="Ease chance"  value={`${easeChancePct}% (−${easeAmount} diff)`}/>
+        <CombatRow label="Ease chance"  value={`${easeChancePct}%`}/>
         <CombatRow label="Skip chance"  value={`${toHit}%`}/>
         <CombatRow label="Time Buffer"  value={`+${buffer}s`}/>
       </div>
