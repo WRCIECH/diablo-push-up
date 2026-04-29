@@ -2,7 +2,7 @@
   {
     "name": "The Butcher",
     "type": "Demon",
-    "dlvl": [1, 1],
+    "dlvl": [2, 2],
     "hp": [220, 320],
     "vitality": 20,
     "damage": [2, 5],
