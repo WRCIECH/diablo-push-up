@@ -123,7 +123,7 @@ export default function DungeonScreen() {
   // ── Navigating ─────────────────────────────────────────────────────────────
 
   const roomDepth = depthLabel(currentNode.depth);
-  const hasChest  = currentNode.type === 'nothing' && !currentNode.chestLooted;
+  const hasChest  = currentNode.type === 'chest' && !currentNode.chestLooted;
 
   return (
     <div className="screen" style={{ gap: '6px' }}>

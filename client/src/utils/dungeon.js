@@ -24,7 +24,7 @@ export function generateDungeon(levelId, locationsData) {
   let levelPlaced   = false;  // exactly one staircase down per dungeon
   let butcherPlaced = false;  // The Butcher appears at most once
   const nodes = {};
-  const nothingEntry = place_pool.find(p => p.type === 'nothing') ?? place_pool[0];
+  const chestEntry = place_pool.find(p => p.type === 'chest') ?? place_pool[0];
 
   function makeNode(parentId, currentDepth) {
     const id = String(counter++);
@@ -44,14 +44,13 @@ export function generateDungeon(levelId, locationsData) {
       let place = weightedPick(place_pool);
       // Enforce exactly one staircase down per dungeon
       if (place.type === 'level') {
-        if (levelPlaced) place = nothingEntry;
+        if (levelPlaced) place = chestEntry;
         else levelPlaced = true;
       }
       if (place.type === 'butcher') {
-        if (butcherPlaced) place = nothingEntry;
+        if (butcherPlaced) place = chestEntry;
         else butcherPlaced = true;
       }
-      const cryptic = Math.random() < (place.cryptic_chance ?? 0.5);
 
       // Build monster list for fight / butcher nodes
       const monsters = [];
@@ -76,7 +75,6 @@ export function generateDungeon(levelId, locationsData) {
         type:        nodeType,
         monsters,
         targetLevel: place.target_level || null,
-        cryptic,
         parentId,
         childrenIds: [],
         visited:  false,
@@ -124,25 +122,19 @@ export function getChildDescription(child, levelDef) {
     const names = monsters.length ? monsters.join(' & ') : 'a creature';
     return `Remains of ${names}. Passage clear.`;
   }
-  if (child.cryptic) {
-    // Butcher rooms use their own atmospheric cryptic descriptions
-    const isPrimordialBoss = monsters[0] === 'The Butcher';
-    const crypticKey = isPrimordialBoss ? 'butcher' : child.type;
-    const pool = levelDef.descriptions.cryptic[crypticKey] || levelDef.descriptions.cryptic[child.type] || ['A passage leads onward.'];
-    return pool[parseInt(child.id, 10) % pool.length];
-  }
   if (child.type === 'fight') {
     const base = levelDef.descriptions.visible[monsters[0]] || 'A creature stirs ahead.';
     return monsters.length > 1 ? `${base} Others lurk nearby.` : base;
   }
-  if (child.type === 'nothing')   return levelDef.descriptions.visible.nothing;
-  if (child.type === 'level')     return levelDef.descriptions.visible.level;
-  if (child.type === 'level_up')  return levelDef.descriptions.visible.level_up || 'Stairs lead upward.';
+  if (child.type === 'chest')    return levelDef.descriptions.visible.chest    || 'An old chest sits here.';
+  if (child.type === 'level')    return levelDef.descriptions.visible.level    || 'Stairs descend further.';
+  if (child.type === 'level_up') return levelDef.descriptions.visible.level_up || 'Stairs lead upward.';
   return 'A passage continues forward.';
 }
 
 export function getArrivalMessage(node) {
-  if (node.type === 'nothing') return 'Nothing of value here. Your torch casts long shadows on the stone walls.';
+  if (node.type === 'chest' && node.chestLooted) return 'The chest has already been looted. Nothing remains.';
+  if (node.type === 'chest') return 'An old chest sits here, waiting to be opened.';
   if (node.type === 'fight' && node.defeated) {
     const monsters = getMonsters(node);
     if (monsters[0] === 'The Butcher')
@@ -170,7 +162,6 @@ export function nodeIcon(node) {
   if (node.type === 'fight')    return node.defeated ? '✓' : '⚔';
   if (node.type === 'level')    return '↓';
   if (node.type === 'level_up') return '↑';
-  if (node.type === 'nothing')  return '·';
-  if (node.cryptic)             return '?';
+  if (node.type === 'chest')    return '·';
   return '·';
 }

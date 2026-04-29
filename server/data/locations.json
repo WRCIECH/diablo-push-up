@@ -14,40 +14,16 @@
         "The weight of the earth presses down as you enter. The smell of death is overwhelming. Choose your path carefully."
       ],
       "place_pool": [
-        { "type": "fight", "monster": "Zombie",              "weight": 12, "cryptic_chance": 0.4 },
-        { "type": "fight", "monster": "Ghoul",               "weight": 6,  "cryptic_chance": 0.5 },
-        { "type": "fight", "monster": "Fallen One (spear)",  "weight": 10, "cryptic_chance": 0.3 },
-        { "type": "fight", "monster": "Fallen One (sword)",  "weight": 8,  "cryptic_chance": 0.3 },
-        { "type": "fight", "monster": "Skeleton",            "weight": 12, "cryptic_chance": 0.5 },
-        { "type": "fight", "monster": "Scavenger",           "weight": 6,  "cryptic_chance": 0.4 },
-        { "type": "nothing",                                  "weight": 26, "cryptic_chance": 0.65 },
-        { "type": "level",  "target_level": 2,               "weight": 20, "cryptic_chance": 0.3 }
+        { "type": "fight", "monster": "Zombie",             "weight": 12 },
+        { "type": "fight", "monster": "Ghoul",              "weight": 6  },
+        { "type": "fight", "monster": "Fallen One (spear)", "weight": 10 },
+        { "type": "fight", "monster": "Fallen One (sword)", "weight": 8  },
+        { "type": "fight", "monster": "Skeleton",           "weight": 12 },
+        { "type": "fight", "monster": "Scavenger",          "weight": 6  },
+        { "type": "chest",                                   "weight": 26 },
+        { "type": "level", "target_level": 2,               "weight": 20 }
       ],
       "descriptions": {
-        "cryptic": {
-          "fight": [
-            "A darkened passage. Something moves within.",
-            "An eerie silence emanates from this corridor. Too quiet.",
-            "You sense a malevolent presence just beyond your sight.",
-            "The torchlight bends away from this passage.",
-            "Scratch marks cover the walls leading this way.",
-            "A low moan echoes from the darkness ahead.",
-            "The stench of death grows stronger in this direction."
-          ],
-          "nothing": [
-            "A shadowed path leads into the unknown.",
-            "The corridor stretches into darkness.",
-            "Uncertain terrain lies ahead.",
-            "The passage seems clear — but looks can deceive.",
-            "Dust-covered stones lead deeper in."
-          ],
-          "level": [
-            "A passage descends deeper into the earth.",
-            "Ancient stairs lead further down into the abyss.",
-            "The darkness below feels different. Heavier.",
-            "Cold air rises from below."
-          ]
-        },
         "visible": {
           "Zombie":             "A shambling undead corpse blocks the path ahead.",
           "Ghoul":              "A hunched ghoul prowls the corridor, seeking flesh.",
@@ -55,7 +31,7 @@
           "Fallen One (sword)": "A Fallen One clutches a chipped sword, shrieking curses.",
           "Skeleton":           "An animated skeleton guards the passage with hollow eyes.",
           "Scavenger":          "A four-legged carrion beast crouches in the darkness ahead.",
-          "nothing":            "The path ahead appears clear — for now.",
+          "chest":              "An old chest sits against the wall, its lock rusted with age.",
           "level":              "Stairs descend deeper into the cathedral's bowels."
         }
       }
@@ -74,50 +50,19 @@
         "You descend into older darkness. The scratching sounds from the walls are closer here. More deliberate."
       ],
       "place_pool": [
-        { "type": "fight", "monster": "Rotting Carcass", "weight": 12, "cryptic_chance": 0.5 },
-        { "type": "fight", "monster": "Corpse Axe",      "weight": 11, "cryptic_chance": 0.5 },
-        { "type": "fight", "monster": "Devil Kin",       "weight": 10, "cryptic_chance": 0.4 },
-        { "type": "fight", "monster": "Vile Hunter",     "weight": 9,  "cryptic_chance": 0.5 },
-        { "type": "fight", "monster": "Ghoul",           "weight": 7,  "cryptic_chance": 0.55 },
-        { "type": "fight", "monster": "Dark One",        "weight": 6,  "cryptic_chance": 0.45 },
-        { "type": "fight", "monster": "Black Death",     "weight": 3,  "cryptic_chance": 0.7 },
-        { "type": "fight", "monster": "Burning Dead",    "weight": 2,  "cryptic_chance": 0.7 },
-        { "type": "butcher",                              "weight": 7,  "cryptic_chance": 0.85 },
-        { "type": "nothing",                              "weight": 13, "cryptic_chance": 0.65 },
-        { "type": "level",  "target_level": 3,           "weight": 20, "cryptic_chance": 0.35 }
+        { "type": "fight", "monster": "Rotting Carcass", "weight": 12 },
+        { "type": "fight", "monster": "Corpse Axe",      "weight": 11 },
+        { "type": "fight", "monster": "Devil Kin",       "weight": 10 },
+        { "type": "fight", "monster": "Vile Hunter",     "weight": 9  },
+        { "type": "fight", "monster": "Ghoul",           "weight": 7  },
+        { "type": "fight", "monster": "Dark One",        "weight": 6  },
+        { "type": "fight", "monster": "Black Death",     "weight": 3  },
+        { "type": "fight", "monster": "Burning Dead",    "weight": 2  },
+        { "type": "butcher",                             "weight": 7  },
+        { "type": "chest",                               "weight": 13 },
+        { "type": "level", "target_level": 3,           "weight": 20 }
       ],
       "descriptions": {
-        "cryptic": {
-          "butcher": [
-            "The smell of blood is overwhelming. Something massive shifts beyond.",
-            "A rhythmic chopping sound echoes from this chamber. Wet. Heavy.",
-            "Flies swarm near this passage. Something large breathes within.",
-            "The floor here is stained almost black. Whatever lives here has fed well.",
-            "A deep, rattling grunt reverberates through the stones."
-          ],
-          "fight": [
-            "The smell of decay is stronger here than anywhere above.",
-            "Slow, deliberate movement echoes from beyond the threshold.",
-            "Something drags itself toward you from the dark.",
-            "The silence here is the wrong kind of silence.",
-            "Scratch marks on the floor lead into this passage.",
-            "A low gurgling carries through the stone walls.",
-            "The torchlight flickers violently near this corridor."
-          ],
-          "nothing": [
-            "A forgotten chamber, empty but not silent.",
-            "Dust thick enough to choke on. Nothing moves.",
-            "The passage appears undisturbed — for now.",
-            "Old bones line the walls, but nothing stirs.",
-            "Ancient carvings mark this room. Their meaning is lost."
-          ],
-          "level": [
-            "Steps descend into a blackness even your torch cannot pierce.",
-            "The air rising from below is colder still.",
-            "Ancient stairs lead to a deeper hell.",
-            "Whatever waits below has been waiting a long time."
-          ]
-        },
         "visible": {
           "Rotting Carcass": "A bloated undead horror lurches through the corridor, trailing decay.",
           "Corpse Axe":      "A skeletal warrior raises its rusted axe as you approach.",
@@ -128,7 +73,7 @@
           "Black Death":     "An enormous undead monstrosity fills the corridor. The air reeks of plague.",
           "Burning Dead":    "A skeleton wreathed in hellfire charges toward you, screeching.",
           "The Butcher":     "AHHH... fresh meat! A massive demon butcher fills the room. His cleaver is already raised.",
-          "nothing":         "The chamber is empty — save for old bones and forgotten trinkets.",
+          "chest":           "A weathered chest rests in the corner, undisturbed for years.",
           "level":           "Stairs descend to the third level of the cathedral."
         }
       }
