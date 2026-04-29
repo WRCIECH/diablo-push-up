@@ -271,9 +271,9 @@ function GearPanel({ player, onEquip, onUnequip, onSell, onUse, onIdentify, inDu
           <EquipSlot slot="weapon"   item={player.equipment.weapon}            onSelect={setSelected}/>
           <EquipSlot slot="armor"    item={player.equipment.armor}             onSelect={setSelected}/>
           <EquipSlot slot="shield"   item={player.equipment.shield}            onSelect={setSelected}/>
-          {/* Row 3: empty — ring1 — ring2 */}
-          <div/>
+          {/* Row 3: ring1 — empty — ring2 */}
           <EquipSlot slot="ring1"    item={player.equipment?.ring1 ?? null}    onSelect={setSelected}/>
+          <div/>
           <EquipSlot slot="ring2"    item={player.equipment?.ring2 ?? null}    onSelect={setSelected}/>
         </div>
       </div>
