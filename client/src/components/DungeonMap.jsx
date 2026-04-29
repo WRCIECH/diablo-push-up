@@ -55,7 +55,6 @@ function roomStyle(node, isCurrent, vis) {
   if (isCurrent) return { fill: '#2a1e06', stroke: '#f0c040', sw: 2 };
 
   if (vis === 'dim') {
-    if (node.type === 'fight') return { fill: '#160a0a', stroke: '#3a1212', sw: 1 };
     if (node.type === 'level') return { fill: '#100e06', stroke: '#383010', sw: 1 };
     return { fill: '#0c0c0a', stroke: '#222220', sw: 0.8 };
   }
@@ -322,12 +321,11 @@ export default function DungeonMap({ dungeon, onClose, inline, onNavigate, onBac
                   {/* Room square */}
                   <rect x={rx} y={ry} width={ROOM} height={ROOM} rx="3"
                         fill={fill} stroke={stroke} strokeWidth={sw}/>
-                  {/* Fight icon */}
-                  {node.type === 'fight' && !isCurrent && (
+                  {/* Fight icon — only shown for visited rooms */}
+                  {node.type === 'fight' && !isCurrent && vis !== 'dim' && (
                     <text x={rx + ROOM/2} y={ry + ROOM/2 + 5}
                           textAnchor="middle" fontSize="13"
-                          fill={node.defeated ? '#2a6a2a' : '#cc3030'}
-                          opacity={vis === 'dim' ? 0.4 : 1}>
+                          fill={node.defeated ? '#2a6a2a' : '#cc3030'}>
                       {node.defeated ? '✓' : '⚔'}
                     </text>
                   )}

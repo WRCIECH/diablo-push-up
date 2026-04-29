@@ -52,10 +52,10 @@ function affixKey(slot) {
 
 // Chest loot — better odds than monsters (Diablo 1 chest distribution)
 const CHEST_DROP_TABLE = [
-  { result: 'nothing', weight: 20 },
-  { result: 'gold',    weight: 35 },
-  { result: 'normal',  weight: 28 },
-  { result: 'magic',   weight: 14 },
+  { result: 'nothing', weight: 35 },
+  { result: 'gold',    weight: 28 },
+  { result: 'normal',  weight: 22 },
+  { result: 'magic',   weight: 12 },
   { result: 'unique',  weight:  3 },
 ];
 
