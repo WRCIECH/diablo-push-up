@@ -32,11 +32,11 @@ export function generateDungeon(levelId, locationsData) {
 
     let node;
     if (isRoot) {
-      // Root = where you arrive when entering this level.
-      // Level 1 entrance comes from Tristram; level 2+ comes from the stairs above.
+      // Root = the staircase you entered from.
+      // Level 1: stairs up go back to Tristram. Level 2+: stairs up go to the previous level.
+      // The levelUpConfirm in DungeonScreen already handles both cases correctly.
       node = {
-        id, depth: 0,
-        type: levelId > 1 ? 'level_up' : 'entrance',
+        id, depth: 0, type: 'level_up',
         parentId: null, childrenIds: [],
         visited: false, defeated: false,
       };
