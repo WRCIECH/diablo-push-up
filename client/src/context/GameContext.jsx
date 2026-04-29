@@ -229,6 +229,7 @@ export function GameProvider({ children }) {
   const [gameData, setGameData] = useState(null);
   const [shopInventory, setShopInventory] = useState(null);
   const [lootResult,   setLootResult]    = useState(null);  // set by FightPreScreen, read by LootScreen
+  const [chestResult,  setChestResult]   = useState(null);  // set by DungeonScreen, read by ChestScreen
   const initializedRef          = useRef(false);
 
   // Keep stateRef in sync for dispatchAndSave
@@ -285,6 +286,7 @@ export function GameProvider({ children }) {
       gameData,
       shopInventory, generateShop, setShopInventory,
       lootResult, setLootResult,
+      chestResult, setChestResult,
     }}>
       {children}
     </GameContext.Provider>

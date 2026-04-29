@@ -10,6 +10,7 @@ import SettingsScreen   from './screens/SettingsScreen.jsx';
 import DungeonScreen    from './screens/DungeonScreen.jsx';
 import FightPreScreen   from './screens/FightPreScreen.jsx';
 import LootScreen       from './screens/LootScreen.jsx';
+import ChestScreen      from './screens/ChestScreen.jsx';
 
 function GameRouter() {
   const { screen, loading, error, state } = useGame();
@@ -53,6 +54,7 @@ function GameRouter() {
     case 'dungeon':    return <DungeonScreen />;
     case 'fight_pre':  return <FightPreScreen />;
     case 'loot':       return <LootScreen />;
+    case 'chest':      return <ChestScreen />;
     default:           return <Tristram />;
   }
 }
