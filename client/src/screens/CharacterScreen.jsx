@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useGame, EXP_TABLE } from '../context/GameContext.jsx';
-import { calcAC, calcToHit, calcPushUpStats } from '../utils/player.js';
-import { resolveItemName, qualityColor, getEffectiveStats } from '../utils/items.js';
+import { calcAC, calcPushUpStats } from '../utils/player.js';
+import { resolveItemName, qualityColor, getEffectiveStats, collectBonuses } from '../utils/items.js';
 import { useMusic, getCurrentTrack } from '../hooks/useMusic.js';
-import { C } from '../utils/combat.js';
+import { C, getMaxLife } from '../utils/combat.js';
 import ItemIcon from '../components/ItemIcon.jsx';
 
 const CLASS_LABEL = { warrior: 'Warrior', rogue: 'Rogue' };
@@ -100,7 +100,7 @@ function buildStatRows(item) {
   const rows = [];
   if (item.damage) {
     const flat = b.damage_flat || 0;
-    rows.push({ label: 'Damage', value: `${item.damage[0]+flat}–${item.damage[1]+flat}` });
+    rows.push({ label: 'Damage', value: `${item.damage + flat}` });
     if (b.damage_pct)  rows.push({ label: '+Damage',  value: `+${b.damage_pct}%`,   color: 'var(--blue-text)' });
     if (b.to_hit_flat) rows.push({ label: '+To Hit',  value: `+${b.to_hit_flat}%`,  color: 'var(--blue-text)' });
   }
@@ -339,14 +339,15 @@ function GearPanel({ player, onEquip, onUnequip, onSell, onUse, onIdentify, inDu
 
 function StatsPanel({ player, canAllocate, onAllocate }) {
   const ac    = calcAC(player);
-  const toHit = calcToHit(player);
+  const skipChancePct = Math.round(eff.dexterity * C.SKIP_CHANCE_PER_ONE_DEXTERITY * 100);
   const eff            = getEffectiveStats(player);
   const weap           = player.equipment.weapon;
-  const weaponAvg      = weap ? (weap.damage[0] + weap.damage[1]) / 2 : 0;
-  const easeChancePct  = Math.round(Math.min(0.95, Math.max(0.05,
-    (40 + Math.floor(eff.strength / 2) + Math.floor(weaponAvg)) / 100
-  )) * 100);
-  const buffer         = eff.vitality * C.VITALITY_TO_SECONDS;
+  const weaponBonuses     = weap ? collectBonuses(weap) : {};
+  const effectiveWeaponDmg = weap
+    ? Math.round((weap.damage + (weaponBonuses.damage_flat || 0)) * (1 + (weaponBonuses.damage_pct || 0) / 100))
+    : 0;
+  const easePower = eff.strength + effectiveWeaponDmg;
+  const maxLife        = Math.round(getMaxLife(player));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -361,13 +362,12 @@ function StatsPanel({ player, canAllocate, onAllocate }) {
         </div>
         <div className="divider" style={{ marginBottom: '10px' }}/>
         {['strength', 'dexterity', 'vitality'].map(stat => {
-          const atMax = player.maxStats[stat] !== undefined && player.stats[stat] >= player.maxStats[stat];
           return (
             <div key={stat} className="stat-row" style={{ padding: '6px 0' }}>
               <span className="stat-label">{STAT_LABELS[stat]}</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span className="stat-value" style={{ fontSize: '16px' }}>{player.stats[stat]}</span>
-                {canAllocate && !atMax && (
+                {canAllocate && (
                   <button onClick={() => onAllocate(stat)} style={{
                     width: '22px', height: '22px', borderRadius: '3px',
                     background: 'var(--bg-panel-light)', border: '1px solid var(--border-gold)',
@@ -384,7 +384,7 @@ function StatsPanel({ player, canAllocate, onAllocate }) {
         <div className="stat-row" style={{ padding: '4px 0' }}>
           <span className="stat-label">Life</span>
           <span className="text-red" style={{ fontSize: '15px', fontWeight: 700 }}>
-            {player.stats.life} / {player.stats.maxLife}
+            {player.stats.life} / {maxLife}
           </span>
         </div>
         <div className="stat-row" style={{ padding: '4px 0' }}>
@@ -397,9 +397,9 @@ function StatsPanel({ player, canAllocate, onAllocate }) {
         <div className="title-small" style={{ marginBottom: '8px' }}>Combat</div>
         <div className="divider" style={{ marginBottom: '10px' }}/>
         <CombatRow label="Hit Resist"   value={ac}/>
-        <CombatRow label="Ease chance"  value={`${easeChancePct}%`}/>
-        <CombatRow label="Skip chance"  value={`${toHit}%`}/>
-        <CombatRow label="Time Buffer"  value={`+${buffer}s`}/>
+        <CombatRow label="Ease power"   value={`${easePower}`}/>
+        <CombatRow label="Skip chance"  value={`${skipChancePct}%`}/>
+        <CombatRow label="Max HP"       value={maxLife}/>
       </div>
     </div>
   );

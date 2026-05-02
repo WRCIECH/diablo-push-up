@@ -3,163 +3,127 @@
 // Fallback defaults here are only used if the API call fails.
 
 export const C = {
-  PUSH_UP_RATIO:         0.5,
-  DAMAGE_TO_SECONDS:     3,
-  BASE_FIGHT_TIME:       120,
-  VITALITY_TO_SECONDS:   2,
-  HEALING_POTION_SECONDS:30,
-  HIT_CHANCE_MIN:        0.05,
-  HIT_CHANCE_MAX:        0.95,
-  PENALTY_MS:            2 * 60 * 60 * 1000,
+  PUSH_UP_RATIO:                 0.5,
+  HEALING_POTION_LIFE_ADDITION:  30,
+  SKIP_CHANCE_PER_ONE_DEXTERITY: 0.003,
+  LIFE_PER_LEVEL:                2,
+  LIFE_POINTS_PER_ONE_VITALITY:  5.0,
+  SECONDS_PER_PUSH_UP:           1.5,
+  PUSH_UP_PREPARATION_TIME:      5.0,
+  MINIMAL_DAMAGE_CHANCE:         0.01,
+  MINIMAL_DAMAGE_PER_SECOND:     1,
+  PENALTY_MS:                    2 * 60 * 60 * 1000,
 };
 
 // Called by GameContext after fetching /api/data/constants from the server.
 export function initConstants(serverC) {
   Object.assign(C, serverC);
-  // Server uses PENALTY_DURATION_MS; client uses PENALTY_MS
   if (serverC.PENALTY_DURATION_MS !== undefined) C.PENALTY_MS = serverC.PENALTY_DURATION_MS;
 }
 
-import { getEffectiveStats } from './items.js';
+import { getEffectiveStats, collectBonuses } from './items.js';
+
+// MaxLife = LIFE_PER_LEVEL × level + vitality × LIFE_POINTS_PER_ONE_VITALITY + item +life bonuses
+export function getMaxLife(player) {
+  const stats = getEffectiveStats(player);
+  const itemLifeBonus = Object.values(player.equipment)
+    .filter(Boolean)
+    .reduce((sum, item) => sum + (collectBonuses(item).life || 0), 0);
+  return C.LIFE_PER_LEVEL * player.level
+       + stats.vitality * C.LIFE_POINTS_PER_ONE_VITALITY
+       + itemLifeBonus;
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function clamp(v, lo, hi) { return Math.min(Math.max(v, lo), hi); }
-
-function rollBetween(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function pickFromWeightedPool(pool) {
-  return pool[Math.floor(Math.random() * pool.length)];
-}
-
-// Find the easiest step down for a given push-up:
-// 1. Same category, difficulty < current → pick the highest among those
-// 2. Fallback: any push-up at exactly difficulty - 1
-// Difficulty 1 push-ups cannot be eased (caller must check).
-function easeDown(pu, pushUpData) {
-  const sameCatLower = pushUpData.filter(
-    p => p.category === pu.category && p.difficulty < pu.difficulty
-  );
-  if (sameCatLower.length > 0) {
-    const maxDiff = Math.max(...sameCatLower.map(p => p.difficulty));
-    return sameCatLower.find(p => p.difficulty === maxDiff);
-  }
-  // Fallback: first push-up in the array at exactly difficulty - 1
-  const targetDiff = pu.difficulty - 1;
-  return (
-    pushUpData.find(p => p.difficulty === targetDiff) ||
-    pushUpData.find(p => p.difficulty < pu.difficulty) ||
-    pu
-  );
-}
 
 function getArmorAC(player) {
-  const { armor, shield, helm } = player.equipment;
   let ac = 0;
-  if (armor)  ac += armor.ac  || 0;
-  if (shield) ac += shield.ac || 0;
-  if (helm)   ac += helm.ac   || 0;
+  for (const item of [player.equipment.armor, player.equipment.shield, player.equipment.helm]) {
+    if (!item) continue;
+    ac += (item.ac || 0) + (collectBonuses(item).ac || 0);
+  }
   return ac;
 }
 
 // ── Main calculation ──────────────────────────────────────────────────────────
 
-/**
- * Runs all 3 combat steps from the GDD and returns everything the fight
- * screen needs to display and act on.
- *
- * Steps:
- *  1. Generate push-up pool → apply Strength reduction (deterministic)
- *  2. Dexterity skip per push-up (probabilistic)
- *  3. Monster hit rolls against original pool → reduce base time (probabilistic)
- */
 // monsters is always an array (single-monster fights pass a one-element array)
 export function calculateFight(player, monsters, pushUpData) {
-  const stats = getEffectiveStats(player); // base stats + all equipped item affix bonuses
+  const stats = getEffectiveStats(player);
 
-  // ── Weapon stats (shared across steps) ───────────────────────────────────
-  const weaponAvgDamage = player.equipment.weapon
-    ? (player.equipment.weapon.damage[0] + player.equipment.weapon.damage[1]) / 2
-    : 0;
-  const weaponDamage = player.equipment.weapon
-    ? rollBetween(player.equipment.weapon.damage[0], player.equipment.weapon.damage[1])
-    : 0;
+  // Weapon damage including affix bonuses — used for ease steps
+  const weaponBase    = player.equipment.weapon?.damage ?? 0;
+  const weaponBonuses = player.equipment.weapon ? collectBonuses(player.equipment.weapon) : {};
+  const weaponDamage  = Math.round(
+    (weaponBase + (weaponBonuses.damage_flat || 0)) * (1 + (weaponBonuses.damage_pct || 0) / 100)
+  );
 
-  // ── Step 0: Generate raw pool from all monsters ───────────────────────────
-  // Each monster contributes its own sub-pool; attacks resolve against that sub-pool only.
-  const playerAC = Math.floor(stats.dexterity / 5) + getArmorAC(player);
-  const rawPool  = [];
-  let baseTimeReduction = 0;
-  let hitsOnPlayer      = 0;
-  const monsterStats    = [];
+  // ── Build raw pool + apply ease + resolve monster attacks (per monster) ───
+  const playerAC  = getArmorAC(player);  // items only — DEX does not contribute to AC
+  const rawPool   = [];
+  const easedPool = [];
+  const monsterStats = [];
 
   for (const monster of monsters) {
-    const count      = Math.max(1, Math.round(monster.vitality * C.PUSH_UP_RATIO));
-    const subPool    = [];
+    const count   = Math.max(1, Math.round(monster.vitality * C.PUSH_UP_RATIO));
+    const types   = monster.push_up_types;   // ordered degradation chain
+    const maxTier = types.length - 1;
+
+    // Ease steps = STR + weapon damage − monster AC, minimum 0.
+    // Each step downgrades one push-up to the next type in the chain,
+    // filling round-robin: all reach tier 1 before any reach tier 2, etc.
+    const easeSteps      = Math.max(0, Math.floor((stats.strength + weaponDamage) * (1 - monster.ac / 100)));
+    const effectiveSteps = Math.min(easeSteps, count * maxTier);
+    const fullRounds     = maxTier > 0 ? Math.floor(effectiveSteps / count) : 0;
+    const remainder      = maxTier > 0 ? effectiveSteps % count : 0;
+
+    const subPool = [];
     for (let i = 0; i < count; i++) {
-      const typeId = pickFromWeightedPool(monster.push_up_types);
-      const def    = pushUpData.find(p => p.id === typeId);
-      if (def) subPool.push({ ...def });
+      const rawDef = pushUpData.find(p => p.id === types[0]);
+      if (!rawDef) continue;
+      subPool.push({ ...rawDef });
+
+      const tier     = Math.min(fullRounds + (i < remainder ? 1 : 0), maxTier);
+      const easedDef = pushUpData.find(p => p.id === types[tier]) || rawDef;
+      const entry    = { ...easedDef };
+      if (tier > 0) entry._originalName = rawDef.name;
+      easedPool.push(entry);
     }
     rawPool.push(...subPool);
 
-    // ── Step 3 (per monster): attacks against its own sub-pool ───────────
-    const monsterHitChance = clamp((monster.toHit - playerAC) / 2 / 100,
-                                   C.HIT_CHANCE_MIN, C.HIT_CHANCE_MAX);
-    let monsterHits = 0;
-    for (let i = 0; i < subPool.length; i++) {
-      if (Math.random() < monsterHitChance) {
-        baseTimeReduction += rollBetween(monster.damage[0], monster.damage[1]) * C.DAMAGE_TO_SECONDS;
-        hitsOnPlayer++;
-        monsterHits++;
-      }
-    }
-    monsterStats.push({ name: monster.name, hitChance: monsterHitChance, hits: monsterHits });
+    // Per-monster life drain rate after the buffer expires.
+    // effectiveChance = monster.toHit/100 − playerAC/100, floored at MINIMAL_DAMAGE_CHANCE.
+    const monsterDPS = Math.max(
+      monster.toHit / 100 - playerAC / 100,
+      C.MINIMAL_DAMAGE_CHANCE
+    ) * monster.damage;
+
+    monsterStats.push({ name: monster.name, easeSteps, dps: monsterDPS });
   }
 
-  // ── Step 1: Strength ease (probabilistic, per push-up) ───────────────────
-  const easeChance = clamp(
-    (40 + Math.floor(stats.strength / 2) + Math.floor(weaponAvgDamage)) / 100,
-    C.HIT_CHANCE_MIN, C.HIT_CHANCE_MAX
-  );
+  // MINIMAL_DAMAGE_PER_SECOND applied once per fight, not per monster
+  const totalDPS = monsterStats.reduce((s, ms) => s + ms.dps, 0) + C.MINIMAL_DAMAGE_PER_SECOND;
 
-  const easedPool = rawPool.map(pu => {
-    if (pu.difficulty <= 1) return { ...pu }; // difficulty 1 cannot be eased
-    if (Math.random() < easeChance) {
-      const eased = easeDown(pu, pushUpData);
-      return { ...eased, _originalName: pu.name };
-    }
-    return { ...pu };
-  });
+  // ── Dexterity skip ────────────────────────────────────────────────────────
+  const skipChance   = stats.dexterity * C.SKIP_CHANCE_PER_ONE_DEXTERITY;
+  const finalPushUps = easedPool.filter(() => Math.random() >= skipChance);
 
-  // ── Step 2: Dexterity skip (probabilistic, per push-up in easedPool) ─────
-  // Use average monster AC so mixed groups scale the skip chance proportionally.
-  const avgAC          = Math.round(monsters.reduce((s, m) => s + m.ac, 0) / monsters.length);
-  const playerToHitPct = 50 + Math.floor(stats.dexterity / 2) + player.level;
-  const skipChance     = clamp((playerToHitPct - avgAC) / 2 / 100,
-                               C.HIT_CHANCE_MIN, C.HIT_CHANCE_MAX);
-  const finalPushUps   = easedPool.filter(() => Math.random() >= skipChance);
-
-  const baseTime       = Math.max(0, C.BASE_FIGHT_TIME - baseTimeReduction);
-  const vitalityBuffer = stats.vitality * C.VITALITY_TO_SECONDS;
+  // Buffer = estimated time to complete all push-ups; life drains only after this.
+  const buffer  = finalPushUps.length * C.SECONDS_PER_PUSH_UP + C.PUSH_UP_PREPARATION_TIME;
+  const maxLife = getMaxLife(player);
 
   return {
     rawPool,
     easedPool,
     finalPushUps,
-    baseTime,
-    vitalityBuffer,
+    buffer,
+    maxLife,
+    damagePerSecond: totalDPS,
     weaponDamage,
-    weaponAvgDamage,
-    easeChance,
     skipChance,
-    playerToHitPct,
     playerAC,
-    monsterStats,    // array — one entry per monster
-    hitsOnPlayer,
-    baseTimeReduction,
+    monsterStats,   // each entry: { name, easeSteps, dps }
   };
 }
 

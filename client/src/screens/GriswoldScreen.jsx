@@ -55,7 +55,7 @@ function buildStatRows(item) {
   const rows = [];
   if (item.damage) {
     const flat = b.damage_flat || 0;
-    rows.push({ label: 'Damage', value: `${item.damage[0]+flat}–${item.damage[1]+flat}` });
+    rows.push({ label: 'Damage', value: `${item.damage + flat}` });
     if (b.damage_pct)  rows.push({ label: '+Damage', value: `+${b.damage_pct}%`,  color: 'var(--blue-text)' });
     if (b.to_hit_flat) rows.push({ label: '+To Hit', value: `+${b.to_hit_flat}%`, color: 'var(--blue-text)' });
   }

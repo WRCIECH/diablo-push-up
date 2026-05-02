@@ -131,14 +131,14 @@ export function getEffectiveStats(player) {
 
 export function getItemStatLine(item) {
   if (item.type === 'healing')
-    return item.heal === 'full' ? 'Restores full vitality buffer' : '+30s fight time';
+    return item.heal === 'full' ? 'Restores full HP' : '+30 HP';
 
   const b = collectBonuses(item);
   const parts = [];
 
   if (item.damage) {
     const flat = b.damage_flat || 0;
-    parts.push(`DMG ${item.damage[0] + flat}–${item.damage[1] + flat}`);
+    parts.push(`DMG ${item.damage + flat}`);
     if (b.damage_pct)  parts.push(`+${b.damage_pct}% DMG`);
     if (b.to_hit_flat) parts.push(`+${b.to_hit_flat}% Hit`);
   }

@@ -115,19 +115,29 @@ export default function DungeonMap({ dungeon, onClose, inline, onNavigate, onBac
     setPan({ x: width / 2 - cx, y: height / 2 - cy });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // All visited rooms (except current) are clickable — player can jump to any visited location
+  // Current room is clear when there's no pending objective
+  const currentNodeClear = useMemo(() => {
+    const node = nodes[currentNodeId];
+    if (!node) return true;
+    if (node.type === 'fight') return node.defeated === true;
+    if (node.type === 'chest') return node.chestLooted === true;
+    return true;
+  }, [nodes, currentNodeId]);
+
+  // All visited rooms (except current) are clickable — player can jump to any visited location.
+  // Dim (unvisited) rooms are only reachable once the current room's objective is complete.
   const clickableIds = useMemo(() => {
     const ids = new Set();
     for (const [id, node] of Object.entries(nodes)) {
       if (id === currentNodeId) continue;
       if (node.visited) {
         ids.add(id); // fast-travel to any visited room
-      } else if (getVis(node, nodes) === 'dim') {
-        ids.add(id); // any revealed-but-unvisited room (parent was entered)
+      } else if (currentNodeClear && getVis(node, nodes) === 'dim') {
+        ids.add(id); // forward navigation only when current room is cleared
       }
     }
     return ids;
-  }, [nodes, currentNodeId]);
+  }, [nodes, currentNodeId, currentNodeClear]);
 
   function handleNodeClick(node) {
     onNavigate?.(node.id);

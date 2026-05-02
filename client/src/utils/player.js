@@ -1,10 +1,12 @@
+import { collectBonuses } from './items.js';
+
 export function calcAC(player) {
-  const { armor, shield, helm } = player.equipment;
-  let acItems = 0;
-  if (armor)  acItems += armor.ac  || 0;
-  if (shield) acItems += shield.ac || 0;
-  if (helm)   acItems += helm.ac   || 0;
-  return Math.floor(player.stats.dexterity / 5) + acItems;
+  let ac = 0;
+  for (const item of [player.equipment.armor, player.equipment.shield, player.equipment.helm]) {
+    if (!item) continue;
+    ac += (item.ac || 0) + (collectBonuses(item).ac || 0);
+  }
+  return ac;
 }
 
 export function calcToHit(player) {
@@ -17,7 +19,7 @@ export function calcReductionPoolRange(player) {
   const weapon = player.equipment.weapon;
   const str = player.stats.strength;
   if (!weapon) return `${str}`;
-  return `${str + weapon.damage[0]}–${str + weapon.damage[1]}`;
+  return `${str + weapon.damage}`;
 }
 
 export function calcPushUpStats(history) {

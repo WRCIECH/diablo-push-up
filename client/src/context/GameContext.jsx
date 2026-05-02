@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef, useState } from 'react';
 import { loadState, saveState, loadGameData } from '../api.js';
 import { generateShopInventory } from '../utils/items.js';
-import { initConstants } from '../utils/combat.js';
+import { initConstants, C, getMaxLife } from '../utils/combat.js';
 
 // ── Class templates ──────────────────────────────────────────────────────────
 
@@ -9,9 +9,7 @@ export const CLASS_TEMPLATES = {
   warrior: {
     class: 'warrior',
     level: 1, exp: 0, statPoints: 0,
-    stats: { strength: 30, dexterity: 20, vitality: 25, life: 70, maxLife: 70 },
-    maxStats: { strength: 250, dexterity: 60, vitality: 100 },
-    lifePerLevel: 2,
+    stats: { strength: 30, dexterity: 20, vitality: 25, life: 127 },
     equipment: {
       weapon: { id: 'short_sword', name: 'Short Sword', slot: 'weapon', damage: [2, 6], reqStr: 18, reqDex: 0, price: 120, sell_price: 30, quality: 'normal', identified: true },
       armor: null, helm: null,
@@ -28,9 +26,7 @@ export const CLASS_TEMPLATES = {
   rogue: {
     class: 'rogue',
     level: 1, exp: 0, statPoints: 0,
-    stats: { strength: 20, dexterity: 30, vitality: 20, life: 45, maxLife: 45 },
-    maxStats: { strength: 55, dexterity: 250, vitality: 80 },
-    lifePerLevel: 2,
+    stats: { strength: 20, dexterity: 30, vitality: 20, life: 102 },
     equipment: {
       weapon: { id: 'short_bow', name: 'Short Bow', slot: 'weapon', damage: [1, 4], reqStr: 25, reqDex: 30, price: 100, sell_price: 25, quality: 'normal', identified: true },
       armor: null, helm: null, shield: null,
@@ -96,8 +92,7 @@ export function reducer(state, action) {
         player.exp -= EXP_TABLE[player.level];
         player.level += 1;
         player.statPoints = (player.statPoints || 0) + 5;
-        player.stats.maxLife += player.lifePerLevel;
-        player.stats.life = player.stats.maxLife;
+        // MaxLife is derived — no stored mutation needed on level-up
       }
       return { ...state, player };
     }
@@ -105,13 +100,7 @@ export function reducer(state, action) {
     case 'ALLOCATE_STAT': {
       const { stat } = action.payload;
       if ((state.player.statPoints || 0) <= 0) return state;
-      const maxVal = state.player.maxStats[stat];
-      if (maxVal !== undefined && state.player.stats[stat] >= maxVal) return state;
       const stats = { ...state.player.stats, [stat]: state.player.stats[stat] + 1 };
-      if (stat === 'vitality') {
-        stats.maxLife += state.player.lifePerLevel;
-        stats.life = Math.min(stats.life + state.player.lifePerLevel, stats.maxLife);
-      }
       return { ...state, player: { ...state.player, stats, statPoints: state.player.statPoints - 1 } };
     }
 
@@ -164,26 +153,27 @@ export function reducer(state, action) {
     case 'USE_POTION': {
       const potion = state.player.inventory.find(i => i.uid === action.payload);
       if (!potion) return state;
-      const heal = potion.heal === 'full'
-        ? state.player.stats.maxLife
-        : Math.ceil(state.player.stats.maxLife / 2);
+      const maxLife = getMaxLife(state.player);
+      const newLife = potion.heal === 'full'
+        ? maxLife
+        : Math.min(maxLife, state.player.stats.life + C.HEALING_POTION_LIFE_ADDITION);
       return {
         ...state,
         player: {
           ...state.player,
           inventory: state.player.inventory.filter(i => i.uid !== action.payload),
-          stats: { ...state.player.stats, life: Math.min(state.player.stats.maxLife, state.player.stats.life + heal) },
+          stats: { ...state.player.stats, life: newLife },
         },
       };
     }
 
     case 'DAMAGE_PLAYER': {
-      const newLife = Math.max(1, state.player.stats.life - action.payload);
+      const newLife = Math.max(0, state.player.stats.life - action.payload);
       return { ...state, player: { ...state.player, stats: { ...state.player.stats, life: newLife } } };
     }
 
     case 'HEAL_FULL':
-      return { ...state, player: { ...state.player, stats: { ...state.player.stats, life: state.player.stats.maxLife } } };
+      return { ...state, player: { ...state.player, stats: { ...state.player.stats, life: getMaxLife(state.player) } } };
 
     case 'ADD_HISTORY':
       return { ...state, history: [...state.history, action.payload] };

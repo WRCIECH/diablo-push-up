@@ -1,12 +1,12 @@
 {
   "weapons": [
-    { "id": "short_sword", "name": "Short Sword", "slot": "weapon", "damage": [2, 6], "durability": 24, "reqStr": 18, "reqDex": 0, "price": 120, "sell_price": 30 },
-    { "id": "club", "name": "Club", "slot": "weapon", "damage": [1, 6], "durability": 20, "reqStr": 0, "reqDex": 0, "price": 20, "sell_price": 5 },
-    { "id": "short_bow", "name": "Short Bow", "slot": "weapon", "damage": [1, 4], "durability": 30, "reqStr": 25, "reqDex": 30, "price": 100, "sell_price": 25 },
-    { "id": "long_sword", "name": "Long Sword", "slot": "weapon", "damage": [2, 8], "durability": 40, "reqStr": 30, "reqDex": 0, "price": 200, "sell_price": 50 },
-    { "id": "hand_axe", "name": "Hand Axe", "slot": "weapon", "damage": [3, 6], "durability": 24, "reqStr": 20, "reqDex": 0, "price": 80, "sell_price": 20 },
-    { "id": "mace", "name": "Mace", "slot": "weapon", "damage": [1, 8], "durability": 32, "reqStr": 16, "reqDex": 0, "price": 90, "sell_price": 22 },
-    { "id": "dagger", "name": "Dagger", "slot": "weapon", "damage": [1, 4], "durability": 16, "reqStr": 0, "reqDex": 20, "price": 30, "sell_price": 7 }
+    { "id": "short_sword", "name": "Short Sword", "slot": "weapon", "damage": 4, "durability": 24, "reqStr": 18, "reqDex": 0, "price": 120, "sell_price": 30 },
+    { "id": "club", "name": "Club", "slot": "weapon", "damage": 4, "durability": 20, "reqStr": 0, "reqDex": 0, "price": 20, "sell_price": 5 },
+    { "id": "short_bow", "name": "Short Bow", "slot": "weapon", "damage": 3, "durability": 30, "reqStr": 25, "reqDex": 30, "price": 100, "sell_price": 25 },
+    { "id": "long_sword", "name": "Long Sword", "slot": "weapon", "damage": 5, "durability": 40, "reqStr": 30, "reqDex": 0, "price": 200, "sell_price": 50 },
+    { "id": "hand_axe", "name": "Hand Axe", "slot": "weapon", "damage": 5, "durability": 24, "reqStr": 20, "reqDex": 0, "price": 80, "sell_price": 20 },
+    { "id": "mace", "name": "Mace", "slot": "weapon", "damage": 5, "durability": 32, "reqStr": 16, "reqDex": 0, "price": 90, "sell_price": 22 },
+    { "id": "dagger", "name": "Dagger", "slot": "weapon", "damage": 3, "durability": 16, "reqStr": 0, "reqDex": 20, "price": 30, "sell_price": 7 }
   ],
   "shields": [
     { "id": "buckler", "name": "Buckler", "slot": "shield", "ac": 3, "durability": 20, "reqStr": 0, "price": 50, "sell_price": 12 },
@@ -38,9 +38,9 @@
   ],
   "prefixes": {
     "weapon": [
-      { "id": "tin", "name": "Tin", "bonus": { "damage_flat_min": 1, "damage_flat_max": 2 }, "price_mult": 1.5 },
-      { "id": "steel", "name": "Steel", "bonus": { "damage_flat_min": 2, "damage_flat_max": 4 }, "price_mult": 2.0 },
-      { "id": "iron", "name": "Iron", "bonus": { "damage_flat_min": 3, "damage_flat_max": 6 }, "price_mult": 2.5 },
+      { "id": "tin", "name": "Tin", "bonus": { "damage_flat": 2 }, "price_mult": 1.5 },
+      { "id": "steel", "name": "Steel", "bonus": { "damage_flat": 3 }, "price_mult": 2.0 },
+      { "id": "iron", "name": "Iron", "bonus": { "damage_flat": 5 }, "price_mult": 2.5 },
       { "id": "warriors", "name": "Warrior's", "bonus": { "damage_pct": 200 }, "price_mult": 5.0 }
     ],
     "armor": [

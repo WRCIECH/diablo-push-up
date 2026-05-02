@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 import { generateUID } from '../utils/items.js';
+import { getMaxLife } from '../utils/combat.js';
 import { useMusic } from '../hooks/useMusic.js';
 import ItemIcon from '../components/ItemIcon.jsx';
 
 const POTION_CATALOG = [
   { id: 'healing_potion',      name: 'Healing Potion',     heal: 'partial', price: 50,  sell_price: 12,
-    effect: '+30s fight time' },
+    effect: '+30 HP' },
   { id: 'full_healing_potion', name: 'Full Healing Potion', heal: 'full',    price: 150, sell_price: 37,
     effect: 'Restores full vitality buffer' },
 ];
@@ -150,7 +151,8 @@ export default function PepinScreen() {
   const [dialog,   setDialog]   = useState('idle');
   const [selected, setSelected] = useState(null);
 
-  const isFullHealth = player.stats.life >= player.stats.maxLife;
+  const maxLife      = getMaxLife(player);
+  const isFullHealth = player.stats.life >= maxLife;
 
   function handleHeal() {
     dispatchAndSave({ type: 'HEAL_FULL' });
@@ -201,12 +203,12 @@ export default function PepinScreen() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
           <span className="title-small">Your Health</span>
           <span className="text-red" style={{ fontSize: '14px', fontWeight: 700 }}>
-            {player.stats.life} / {player.stats.maxLife}
+            {player.stats.life} / {Math.round(maxLife)}
           </span>
         </div>
         <div className="progress-bar" style={{ marginBottom: '10px' }}>
           <div className="progress-fill" style={{
-            width: `${(player.stats.life / player.stats.maxLife) * 100}%`,
+            width: `${(player.stats.life / maxLife) * 100}%`,
             background: 'linear-gradient(90deg, #6b0000, #cc2222)',
           }}/>
         </div>

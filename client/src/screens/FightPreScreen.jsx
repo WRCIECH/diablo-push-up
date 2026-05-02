@@ -82,24 +82,31 @@ function PushUpRow({ pushUp, count, expanded, onToggle }) {
 
 // ── Timer display ─────────────────────────────────────────────────────────────
 
-function TimerDisplay({ seconds, isBuffer, ended }) {
-  const color = ended
-    ? 'var(--red-text)'
-    : isBuffer
-      ? '#e08020'    // amber for buffer
-      : 'var(--text-white)';
+function TimerDisplay({ seconds, life, maxLife, isDraining, ended }) {
+  const color = ended ? 'var(--red-text)' : isDraining ? '#e08020' : 'var(--text-white)';
+  const display = isDraining
+    ? `${Math.ceil(Math.max(0, life))}`
+    : formatTime(seconds);
+  const label = ended ? 'HP DEPLETED' : isDraining ? 'HP REMAINING' : 'REMAINING';
 
   return (
     <div style={{ textAlign: 'center', padding: '16px 0' }}>
       <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(52px, 14vw, 72px)',
                     fontWeight: 900, color, letterSpacing: '0.04em',
                     textShadow: `0 0 20px ${color}66` }}>
-        {ended ? 'TIME' : formatTime(seconds)}
+        {display}
       </div>
+      {isDraining && maxLife > 0 && (
+        <div style={{ margin: '6px 16px 0', height: 6, background: 'var(--border-dark)', borderRadius: 3 }}>
+          <div style={{ height: '100%', borderRadius: 3, background: ended ? 'var(--red-text)' : '#cc2222',
+                        width: `${Math.max(0, Math.min(100, life / maxLife * 100))}%`,
+                        transition: 'width 0.9s linear' }}/>
+        </div>
+      )}
       <div style={{ fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase',
-                    color: ended ? 'var(--red-text)' : isBuffer ? '#e08020' : 'var(--text-dim)',
+                    color: ended ? 'var(--red-text)' : isDraining ? '#e08020' : 'var(--text-dim)',
                     marginTop: '4px' }}>
-        {ended ? "TIME'S UP" : isBuffer ? 'VITALITY BUFFER' : 'REMAINING'}
+        {label}
       </div>
     </div>
   );
@@ -134,9 +141,9 @@ export default function FightPreScreen() {
   const [lostConfirm, setLostConfirm] = useState(false);
 
   // Timer (managed via ref to avoid stale-closure bugs)
-  const timerRef   = useRef({ main: 0, buf: 0, isBuffer: false });
+  const timerRef   = useRef({ buffer: 0, isDraining: false, life: 0, maxLife: 0, dps: 0 });
   const intervalId = useRef(null);
-  const [timerDisp, setTimerDisp] = useState({ seconds: 0, isBuffer: false, ended: false });
+  const [timerDisp, setTimerDisp] = useState({ seconds: 0, life: 0, maxLife: 0, isDraining: false, ended: false });
 
   // ── Calculate on mount ────────────────────────────────────────────────────
   useEffect(() => {
@@ -152,23 +159,21 @@ export default function FightPreScreen() {
     intervalId.current = setInterval(() => {
       const t = timerRef.current;
 
-      if (!t.isBuffer) {
-        if (t.main > 0) {
-          t.main -= 1;
-          setTimerDisp({ seconds: t.main, isBuffer: false, ended: false });
+      if (!t.isDraining) {
+        if (t.buffer > 0) {
+          t.buffer -= 1;
+          setTimerDisp({ seconds: t.buffer, life: t.life, maxLife: t.maxLife, isDraining: false, ended: false });
         } else {
-          // Switch to vitality buffer
-          t.isBuffer = true;
-          setTimerDisp({ seconds: t.buf, isBuffer: true, ended: false });
+          t.isDraining = true;
+          setTimerDisp({ seconds: 0, life: t.life, maxLife: t.maxLife, isDraining: true, ended: false });
         }
       } else {
-        if (t.buf > 0) {
-          t.buf -= 1;
-          setTimerDisp({ seconds: t.buf, isBuffer: true, ended: false });
-        } else {
-          // Time's up — stop timer, show ended state, player must confirm loss
+        t.life = Math.max(0, t.life - t.dps);
+        if (t.life <= 0) {
           clearInterval(intervalId.current);
-          setTimerDisp({ seconds: 0, isBuffer: true, ended: true });
+          setTimerDisp({ seconds: 0, life: 0, maxLife: t.maxLife, isDraining: true, ended: true });
+        } else {
+          setTimerDisp({ seconds: 0, life: t.life, maxLife: t.maxLife, isDraining: true, ended: false });
         }
       }
     }, 1000);
@@ -179,30 +184,36 @@ export default function FightPreScreen() {
   // ── Actions ───────────────────────────────────────────────────────────────
 
   function startFight() {
-    timerRef.current = { main: fightData.baseTime, buf: fightData.vitalityBuffer, isBuffer: false };
-    setTimerDisp({ seconds: fightData.baseTime, isBuffer: false, ended: false });
+    timerRef.current = {
+      buffer: Math.round(fightData.buffer),
+      isDraining: false,
+      life: fightData.maxLife,
+      maxLife: fightData.maxLife,
+      dps: fightData.damagePerSecond,
+    };
+    setTimerDisp({ seconds: Math.round(fightData.buffer), life: fightData.maxLife,
+                   maxLife: fightData.maxLife, isDraining: false, ended: false });
     setPhase('active');
   }
 
   function drinkPotion(healType) {
     const potion = state.player.inventory.find(i => i.type === 'healing' && i.heal === healType);
-    if (!potion || !timerRef.current.isBuffer) return;
-    const isFull = healType === 'full';
-    timerRef.current.buf = isFull
-      ? fightData.vitalityBuffer
-      : Math.min(fightData.vitalityBuffer, timerRef.current.buf + C.HEALING_POTION_SECONDS);
-    setTimerDisp(d => ({ ...d, seconds: timerRef.current.buf }));
+    if (!potion || !timerRef.current.isDraining) return;
+    const t = timerRef.current;
+    t.life = healType === 'full'
+      ? t.maxLife
+      : Math.min(t.maxLife, t.life + C.HEALING_POTION_LIFE_ADDITION);
+    setTimerDisp(d => ({ ...d, life: t.life }));
     dispatchAndSave({ type: 'REMOVE_ITEM', payload: potion.uid });
   }
 
   function handleWin() {
     clearInterval(intervalId.current);
 
-    // HP damage: each buffer second consumed costs 1 life per VITALITY_TO_SECONDS
-    if (phase === 'active' && timerRef.current.isBuffer) {
-      const bufferUsed = Math.max(0, fightData.vitalityBuffer - timerRef.current.buf);
-      const damage     = Math.floor(bufferUsed / C.VITALITY_TO_SECONDS);
-      if (damage > 0) dispatchAndSave({ type: 'DAMAGE_PLAYER', payload: damage });
+    // Apply HP damage: life lost during the drain phase
+    if (phase === 'active' && timerRef.current.isDraining) {
+      const lifeLost = Math.round(timerRef.current.maxLife - timerRef.current.life);
+      if (lifeLost > 0) dispatchAndSave({ type: 'DAMAGE_PLAYER', payload: lifeLost });
     }
 
     const fightId  = generateUID('fight');
@@ -277,9 +288,9 @@ export default function FightPreScreen() {
   if (phase === 'active') {
     const aggregated = aggregatePushUps(fightData.finalPushUps);
     const potionDefs = [
-      { healType: 'partial', secs: C.HEALING_POTION_SECONDS,
+      { healType: 'partial', label: `+${C.HEALING_POTION_LIFE_ADDITION} HP`,
         placeholder: { id: 'healing_potion',      slot: 'potion', heal: 'partial' } },
-      { healType: 'full',    secs: fightData.vitalityBuffer,
+      { healType: 'full',    label: 'Full HP',
         placeholder: { id: 'full_healing_potion', slot: 'potion', heal: 'full'    } },
     ].map(def => ({
       ...def,
@@ -304,10 +315,10 @@ export default function FightPreScreen() {
         {/* Timer */}
         <div className="panel" style={{ flexShrink: 0, position: 'relative' }}>
           <TimerDisplay {...timerDisp} />
-          {!timerDisp.isBuffer && fightData.vitalityBuffer > 0 && (
+          {!timerDisp.isDraining && (
             <div style={{ textAlign: 'center', paddingBottom: '10px' }}>
               <span className="text-dim" style={{ fontSize: '11px' }}>
-                + {formatTime(fightData.vitalityBuffer)} vitality buffer
+                {fightData.damagePerSecond.toFixed(1)} HP/s drain · {Math.round(fightData.maxLife)} max HP
               </span>
             </div>
           )}
@@ -342,27 +353,27 @@ export default function FightPreScreen() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
           {/* Potion row — one slot per type, expandable for future potions */}
           <div style={{ display: 'flex', gap: '8px' }}>
-            {potionDefs.map(({ healType, secs, placeholder, items }) => {
+            {potionDefs.map(({ healType, label, placeholder, items }) => {
               const count    = items.length;
               const iconItem = items[0] ?? placeholder;
               return (
                 <div key={healType} style={{ position: 'relative' }}>
                   <button
                     onClick={() => drinkPotion(healType)}
-                    disabled={count === 0 || !timerDisp.isBuffer}
+                    disabled={count === 0 || !timerDisp.isDraining}
                     style={{
                       width: 56, height: 56, borderRadius: '4px',
-                      cursor: count > 0 && timerDisp.isBuffer ? 'pointer' : 'default',
+                      cursor: count > 0 && timerDisp.isDraining ? 'pointer' : 'default',
                       background: count > 0 ? 'var(--bg-input)' : 'var(--bg-panel)',
                       border: `1px solid ${count > 0 ? 'var(--border-mid)' : 'var(--border-dark)'}`,
-                      opacity: count > 0 && timerDisp.isBuffer ? 1 : 0.35,
+                      opacity: count > 0 && timerDisp.isDraining ? 1 : 0.35,
                       display: 'flex', flexDirection: 'column',
                       alignItems: 'center', justifyContent: 'center', gap: '2px',
                     }}
                   >
                     <ItemIcon item={iconItem} size={34}/>
                     <span style={{ fontSize: '9px', color: 'var(--text-dim)', lineHeight: 1 }}>
-                      +{secs}s
+                      {label}
                     </span>
                   </button>
                   {count > 0 && (
@@ -464,12 +475,12 @@ export default function FightPreScreen() {
 
           {/* Time overview */}
           <div className="panel" style={{ padding: '12px' }}>
-            <div className="title-small" style={{ marginBottom: '8px' }}>Fight Time</div>
+            <div className="title-small" style={{ marginBottom: '8px' }}>Fight Overview</div>
             <div className="divider" style={{ marginBottom: '8px' }} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px' }}>
-              <StatRow label="Base time"      value={formatTime(fightData.baseTime)} />
-              <StatRow label="Vitality buffer" value={`+${formatTime(fightData.vitalityBuffer)}`}
-                       color="var(--blue-text)" />
+              <StatRow label="Prep buffer"   value={formatTime(fightData.buffer)} />
+              <StatRow label="Max HP"        value={Math.round(fightData.maxLife)}  color="var(--blue-text)" />
+              <StatRow label="HP drain/sec"  value={fightData.damagePerSecond.toFixed(1)} color="var(--red-text)" />
             </div>
           </div>
 
@@ -503,13 +514,13 @@ export default function FightPreScreen() {
             <div className="title-small" style={{ marginBottom: '8px' }}>Combat Calculation</div>
             <div className="divider" style={{ marginBottom: '8px' }} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px' }}>
-              <StatRow label="Ease chance (STR)" value={pct(fightData.easeChance)} color="var(--green-text)" />
               <StatRow label="Skip chance (DEX)" value={pct(fightData.skipChance)} color="var(--green-text)" />
               {fightData.monsterStats.map(ms => (
-                <StatRow key={ms.name} label={`${ms.name} hit%`} value={pct(ms.hitChance)} color="var(--red-text)" />
+                <React.Fragment key={ms.name}>
+                  <StatRow label={`${ms.name} ease`}  value={`${ms.easeSteps}`}   color="var(--green-text)" />
+                  <StatRow label={`${ms.name} HP/s`}  value={ms.dps.toFixed(1)}   color="var(--red-text)" />
+                </React.Fragment>
               ))}
-              <StatRow label="Time lost"  value={`-${fightData.baseTimeReduction}s`}
-                        color={fightData.baseTimeReduction > 0 ? 'var(--red-text)' : 'var(--text-dim)'} />
             </div>
           </div>
         </> ) : (
