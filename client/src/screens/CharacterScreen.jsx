@@ -83,15 +83,6 @@ function InventoryCell({ item, onSelect }) {
 
 // ── Detailed stat rows for the modal ─────────────────────────────────────────
 
-function collectBonuses(item) {
-  if (!item.identified) return {};
-  const out = {};
-  for (const rolled of [item.prefix?.rolled, item.suffix?.rolled]) {
-    for (const [k, v] of Object.entries(rolled || {})) out[k] = (out[k] || 0) + v;
-  }
-  return out;
-}
-
 function buildStatRows(item) {
   if (item.type === 'healing') {
     return [{ label: 'Fight time', value: '+30s', color: 'var(--green-text)' }];
