@@ -1,3 +1,5 @@
+import { getEffectiveStats, collectBonuses } from './items.js';
+
 // ── Combat constants — loaded from server/constants.js via /api/data/constants ─
 // Edit server/constants.js to tune; the client picks up the values on load.
 // Fallback defaults here are only used if the API call fails.
@@ -20,8 +22,6 @@ export function initConstants(serverC) {
   Object.assign(C, serverC);
   if (serverC.PENALTY_DURATION_MS !== undefined) C.PENALTY_MS = serverC.PENALTY_DURATION_MS;
 }
-
-import { getEffectiveStats, collectBonuses } from './items.js';
 
 // MaxLife = LIFE_PER_LEVEL × level + vitality × LIFE_POINTS_PER_ONE_VITALITY + item +life bonuses
 export function getMaxLife(player) {
