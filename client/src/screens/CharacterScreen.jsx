@@ -366,7 +366,6 @@ function StatsPanel({ player, canAllocate, onAllocate }) {
                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>+</button>
                 )}
-                {atMax && <span className="text-dim" style={{ fontSize: '10px' }}>MAX</span>}
               </div>
             </div>
           );
