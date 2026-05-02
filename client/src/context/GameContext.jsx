@@ -11,13 +11,13 @@ export const CLASS_TEMPLATES = {
     level: 1, exp: 0, statPoints: 0,
     stats: { strength: 30, dexterity: 20, vitality: 25, life: 127 },
     equipment: {
-      weapon: { id: 'short_sword', name: 'Short Sword', slot: 'weapon', damage: [2, 6], reqStr: 18, reqDex: 0, price: 120, sell_price: 30, quality: 'normal', identified: true },
+      weapon: { id: 'short_sword', name: 'Short Sword', slot: 'weapon', damage: 4, reqStr: 18, reqDex: 0, price: 120, sell_price: 30, quality: 'normal', identified: true },
       armor: null, helm: null,
       shield: { id: 'buckler', name: 'Buckler', slot: 'shield', ac: 3, reqStr: 0, price: 50, sell_price: 12, quality: 'normal', identified: true },
       ring1: null, ring2: null, talisman: null,
     },
     inventory: [
-      { id: 'club', name: 'Club', slot: 'weapon', damage: [1, 6], reqStr: 0, reqDex: 0, price: 20, sell_price: 5, quality: 'normal', identified: true, uid: 'inv_0' },
+      { id: 'club', name: 'Club', slot: 'weapon', damage: 4, reqStr: 0, reqDex: 0, price: 20, sell_price: 5, quality: 'normal', identified: true, uid: 'inv_0' },
       { id: 'healing_potion', name: 'Healing Potion', slot: 'potion', type: 'healing', heal: 'partial', price: 50, sell_price: 12, quality: 'normal', identified: true, uid: 'inv_1' },
       { id: 'healing_potion', name: 'Healing Potion', slot: 'potion', type: 'healing', heal: 'partial', price: 50, sell_price: 12, quality: 'normal', identified: true, uid: 'inv_2' },
     ],
@@ -28,7 +28,7 @@ export const CLASS_TEMPLATES = {
     level: 1, exp: 0, statPoints: 0,
     stats: { strength: 20, dexterity: 30, vitality: 20, life: 102 },
     equipment: {
-      weapon: { id: 'short_bow', name: 'Short Bow', slot: 'weapon', damage: [1, 4], reqStr: 25, reqDex: 30, price: 100, sell_price: 25, quality: 'normal', identified: true },
+      weapon: { id: 'short_bow', name: 'Short Bow', slot: 'weapon', damage: 3, reqStr: 25, reqDex: 30, price: 100, sell_price: 25, quality: 'normal', identified: true },
       armor: null, helm: null, shield: null,
       ring1: null, ring2: null, talisman: null,
     },
@@ -39,6 +39,33 @@ export const CLASS_TEMPLATES = {
     gold: 100,
   },
 };
+
+// ── Save migration ───────────────────────────────────────────────────────────
+// Converts old-format saves (damage arrays, stored maxLife, lifePerLevel) to
+// the current format. Safe to run on already-migrated saves.
+
+function fixItemDamage(item) {
+  if (!item || !Array.isArray(item.damage)) return item;
+  return { ...item, damage: Math.round((item.damage[0] + item.damage[1]) / 2) };
+}
+
+function migrateSave(state) {
+  if (!state?.player) return state;
+  const p = state.player;
+  const isOld = p.lifePerLevel !== undefined || p.stats?.maxLife !== undefined;
+  if (!isOld) return state;
+
+  const equipment = Object.fromEntries(
+    Object.entries(p.equipment).map(([slot, item]) => [slot, fixItemDamage(item)])
+  );
+  const inventory = p.inventory.map(fixItemDamage);
+
+  const { maxLife: _ml, ...stats } = p.stats;
+  stats.life = C.LIFE_PER_LEVEL * p.level + stats.vitality * C.LIFE_POINTS_PER_ONE_VITALITY;
+
+  const { lifePerLevel: _lpl, maxStats: _ms, ...cleanPlayer } = p;
+  return { ...state, player: { ...cleanPlayer, stats, equipment, inventory } };
+}
 
 export const EXP_TABLE = [0, 2000, 4620, 6440, 8360, 10700, 13600, 17100, 21400, 26800, 33400, 41600, 51800, 64200, 79400, 98200, 121000, 149000, 183600, 225600];
 
@@ -240,7 +267,7 @@ export function GameProvider({ children }) {
         setGameData({ items, monsters, pushUps, locations });
         initializedRef.current = true;
         if (stateResult.exists && stateResult.state?.player) {
-          dispatch({ type: 'LOAD', payload: stateResult.state });
+          dispatch({ type: 'LOAD', payload: migrateSave(stateResult.state) });
           const savedLocation = stateResult.state.currentLocation;
           if (savedLocation === 'dungeon' && stateResult.state.dungeon) {
             setScreen('dungeon');
