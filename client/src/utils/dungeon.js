@@ -57,9 +57,8 @@ export function generateDungeon(levelId, locationsData) {
       if (place.type === 'fight') {
         monsters.push(place.monster);
         const addProb = levelDef.additional_enemy_probability ?? 0;
-        const fightPool = place_pool.filter(p => p.type === 'fight');
-        while (fightPool.length && Math.random() < addProb) {
-          monsters.push(weightedPick(fightPool).monster);
+        while (Math.random() < addProb) {
+          monsters.push(place.monster); // same monster only — mixed types cause mixed push-up types
         }
       }
       if (place.type === 'butcher') {

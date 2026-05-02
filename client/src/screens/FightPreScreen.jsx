@@ -7,6 +7,44 @@ import { rollLoot } from '../utils/loot.js';
 import { getMonsters } from '../utils/dungeon.js';
 import ItemIcon from '../components/ItemIcon.jsx';
 
+// ── Life orb ──────────────────────────────────────────────────────────────────
+
+function LifeOrb({ current, max, size = 64 }) {
+  const ratio = max > 0 ? Math.max(0, Math.min(1, current / max)) : 0;
+  const r  = size / 2;
+  const fillY = size * (1 - ratio);
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+      <svg width={size} height={size} style={{ display: 'block' }}>
+        <defs>
+          <clipPath id="orb-shape">
+            <circle cx={r} cy={r} r={r - 2}/>
+          </clipPath>
+        </defs>
+        {/* Empty background */}
+        <circle cx={r} cy={r} r={r - 2} fill="#130202"/>
+        {/* Liquid fill */}
+        <g clipPath="url(#orb-shape)">
+          <rect x="0" y={fillY} width={size} height={size} fill="#7a0a0a"/>
+          {/* Ripple highlight at fill surface */}
+          {ratio > 0 && ratio < 1 && (
+            <rect x="0" y={fillY} width={size} height="3" fill="#cc2222" opacity="0.5"/>
+          )}
+        </g>
+        {/* Glass shine */}
+        <ellipse cx={r * 0.72} cy={r * 0.6} rx={r * 0.28} ry={r * 0.18}
+                 fill="white" opacity="0.12"/>
+        {/* Border */}
+        <circle cx={r} cy={r} r={r - 1} fill="none" stroke="#5a1212" strokeWidth="2"/>
+      </svg>
+      <div style={{ fontSize: '12px', color: ratio < 0.3 ? 'var(--red-text)' : 'var(--text-cream)',
+                    fontWeight: 600, letterSpacing: '0.04em' }}>
+        {Math.ceil(current)} <span style={{ color: 'var(--text-dim)', fontWeight: 400 }}>/ {Math.round(max)}</span>
+      </div>
+    </div>
+  );
+}
+
 // ── Monster portrait (SVG, type-coloured) ─────────────────────────────────────
 
 function MonsterPortrait({ monster, size = 80 }) {
@@ -184,14 +222,16 @@ export default function FightPreScreen() {
   // ── Actions ───────────────────────────────────────────────────────────────
 
   function startFight() {
+    const currentLife = player.stats.life;
     timerRef.current = {
       buffer: Math.round(fightData.buffer),
       isDraining: false,
-      life: fightData.maxLife,
+      life: currentLife,
+      startingLife: currentLife,
       maxLife: fightData.maxLife,
       dps: fightData.damagePerSecond,
     };
-    setTimerDisp({ seconds: Math.round(fightData.buffer), life: fightData.maxLife,
+    setTimerDisp({ seconds: Math.round(fightData.buffer), life: currentLife,
                    maxLife: fightData.maxLife, isDraining: false, ended: false });
     setPhase('active');
   }
@@ -210,9 +250,9 @@ export default function FightPreScreen() {
   function handleWin() {
     clearInterval(intervalId.current);
 
-    // Apply HP damage: life lost during the drain phase
+    // Apply HP damage: difference between life at fight start and life now
     if (phase === 'active' && timerRef.current.isDraining) {
-      const lifeLost = Math.round(timerRef.current.maxLife - timerRef.current.life);
+      const lifeLost = Math.round(timerRef.current.startingLife - timerRef.current.life);
       if (lifeLost > 0) dispatchAndSave({ type: 'DAMAGE_PLAYER', payload: lifeLost });
     }
 
@@ -477,10 +517,12 @@ export default function FightPreScreen() {
           <div className="panel" style={{ padding: '12px' }}>
             <div className="title-small" style={{ marginBottom: '8px' }}>Fight Overview</div>
             <div className="divider" style={{ marginBottom: '8px' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px' }}>
-              <StatRow label="Prep buffer"   value={formatTime(fightData.buffer)} />
-              <StatRow label="Max HP"        value={Math.round(fightData.maxLife)}  color="var(--blue-text)" />
-              <StatRow label="HP drain/sec"  value={fightData.damagePerSecond.toFixed(1)} color="var(--red-text)" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <LifeOrb current={player.stats.life} max={fightData.maxLife} size={64}/>
+              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px' }}>
+                <StatRow label="Prep buffer"  value={formatTime(fightData.buffer)} />
+                <StatRow label="HP drain/sec" value={fightData.damagePerSecond.toFixed(1)} color="var(--red-text)" />
+              </div>
             </div>
           </div>
 
