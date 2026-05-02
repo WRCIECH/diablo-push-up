@@ -329,9 +329,9 @@ function GearPanel({ player, onEquip, onUnequip, onSell, onUse, onIdentify, inDu
 // ── Stats tab ─────────────────────────────────────────────────────────────────
 
 function StatsPanel({ player, canAllocate, onAllocate }) {
-  const ac    = calcAC(player);
-  const skipChancePct = Math.round(eff.dexterity * C.SKIP_CHANCE_PER_ONE_DEXTERITY * 100);
+  const ac             = calcAC(player);
   const eff            = getEffectiveStats(player);
+  const skipChancePct  = Math.round(eff.dexterity * C.SKIP_CHANCE_PER_ONE_DEXTERITY * 100);
   const weap           = player.equipment.weapon;
   const weaponBonuses     = weap ? collectBonuses(weap) : {};
   const effectiveWeaponDmg = weap
