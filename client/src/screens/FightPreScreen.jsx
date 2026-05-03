@@ -7,6 +7,29 @@ import { rollLoot, rollBossLoot } from '../utils/loot.js';
 import { getMonsters, resolveMonster } from '../utils/dungeon.js';
 import ItemIcon from '../components/ItemIcon.jsx';
 
+// ── Potion drink sound (synthesised — no audio file needed) ──────────────────
+
+function playPotionSound() {
+  try {
+    const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+    const gain = ctx.createGain();
+    gain.connect(ctx.destination);
+    // Two-tone glug: quick high chirp then a lower settling tone
+    [[520, 0, 0.08, 0.18], [300, 0.12, 0.1, 0.28]].forEach(([freq, start, , stop]) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.connect(gain);
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.6, ctx.currentTime + stop);
+      osc.start(ctx.currentTime + start);
+      osc.stop(ctx.currentTime + stop);
+    });
+    gain.gain.setValueAtTime(0.25, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    setTimeout(() => ctx.close(), 500);
+  } catch (_) { /* audio not available */ }
+}
+
 // ── Life orb ──────────────────────────────────────────────────────────────────
 
 function LifeOrb({ current, max, size = 64 }) {
@@ -265,6 +288,7 @@ export default function FightPreScreen() {
       : Math.min(t.maxLife, t.life + C.HEALING_POTION_LIFE_ADDITION);
     setTimerDisp(d => ({ ...d, life: t.life }));
     dispatchAndSave({ type: 'REMOVE_ITEM', payload: potion.uid });
+    playPotionSound();
   }
 
   function handleWin() {
