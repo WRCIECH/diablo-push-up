@@ -3,8 +3,8 @@ import { useGame, EXP_TABLE } from '../context/GameContext.jsx';
 import { useMusic } from '../hooks/useMusic.js';
 import { calculateFight, aggregatePushUps, formatTime, pct, C } from '../utils/combat.js';
 import { rollBetween, generateUID } from '../utils/items.js';
-import { rollLoot } from '../utils/loot.js';
-import { getMonsters } from '../utils/dungeon.js';
+import { rollLoot, rollBossLoot } from '../utils/loot.js';
+import { getMonsters, resolveMonster } from '../utils/dungeon.js';
 import ItemIcon from '../components/ItemIcon.jsx';
 
 // ── Life orb ──────────────────────────────────────────────────────────────────
@@ -48,9 +48,17 @@ function LifeOrb({ current, max, size = 64 }) {
 // ── Monster portrait (SVG, type-coloured) ─────────────────────────────────────
 
 function MonsterPortrait({ monster, size = 80 }) {
-  const pal = monster?.type === 'Animal'
-    ? { bg: '#080a08', border: '#1a3010', eye: '#44aa22', body: '#1a3010' }
-    : { bg: '#1a0808', border: '#5a1010', eye: '#cc2222', body: '#5a1010' };
+  const variant  = monster?.variant || 'normal';
+  const isAnimal = monster?.type === 'Animal';
+  const pal = variant === 'boss'
+    ? { bg: '#0a0800', border: '#c8a000', eye: '#ffd700', body: '#8a6000' }
+    : variant === 'strong'
+      ? (isAnimal
+          ? { bg: '#080a08', border: '#287a1a', eye: '#66ee22', body: '#287a1a' }
+          : { bg: '#200808', border: '#8a1414', eye: '#ff4444', body: '#8a1414' })
+      : (isAnimal
+          ? { bg: '#080a08', border: '#1a3010', eye: '#44aa22', body: '#1a3010' }
+          : { bg: '#1a0808', border: '#5a1010', eye: '#cc2222', body: '#5a1010' });
   return (
     <svg viewBox="0 0 96 96" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
       <rect width="96" height="96" fill={pal.bg} rx="4"/>
@@ -66,6 +74,18 @@ function MonsterPortrait({ monster, size = 80 }) {
             fill={pal.body} opacity="0.7"/>
       <path d="M28,54 Q10,62 12,76" fill="none" stroke={pal.body} strokeWidth="6" strokeLinecap="round"/>
       <path d="M68,54 Q86,62 84,76" fill="none" stroke={pal.body} strokeWidth="6" strokeLinecap="round"/>
+      {/* Boss crown */}
+      {variant === 'boss' && (
+        <path d="M32,18 L38,8 L48,14 L58,8 L64,18 L62,24 L34,24 Z"
+              fill="#ffd700" opacity="0.9"/>
+      )}
+      {/* Strong indicator — double stripe */}
+      {variant === 'strong' && (
+        <>
+          <line x1="4" y1="4" x2="16" y2="4" stroke={pal.eye} strokeWidth="3" strokeLinecap="round"/>
+          <line x1="4" y1="9" x2="12" y2="9" stroke={pal.eye} strokeWidth="2" strokeLinecap="round"/>
+        </>
+      )}
     </svg>
   );
 }
@@ -169,7 +189,7 @@ export default function FightPreScreen() {
   const player   = state.player;
   const monsterNames = node ? getMonsters(node) : [];
   const monsters = monsterNames
-    .map(name => gameData?.monsters?.find(m => m.name === name))
+    .map(name => resolveMonster(name, gameData?.monsters ?? []))
     .filter(Boolean);
 
   // ── Phase state: 'pre' | 'active' | 'result' ─────────────────────────────
@@ -260,11 +280,13 @@ export default function FightPreScreen() {
     const totalExp = monsters.reduce((s, m) => s + m.exp, 0);
     const newLevel = calcNewLevel(player, totalExp);
 
-    // Roll loot per monster
+    // Roll loot per monster (boss guarantees magic/unique)
     let totalGold = 0;
     const lootItems = [];
     for (const monster of monsters) {
-      const drop = rollLoot(monster, gameData.items);
+      const drop = monster.variant === 'boss'
+        ? rollBossLoot(gameData.items)
+        : rollLoot(monster, gameData.items);
       if (drop?.type === 'gold')      totalGold += drop.amount;
       else if (drop?.type === 'item') lootItems.push(drop.item);
     }
@@ -276,7 +298,7 @@ export default function FightPreScreen() {
     for (const item of lootItems) dispatchAndSave({ type: 'ADD_ITEM', payload: item });
 
     // One history entry per required push-up
-    const monsterLabel = monsters.map(m => m.name).join(', ');
+    const monsterLabel = monsters.map(m => m.displayName || m.name).join(', ');
     for (const pu of fightData.finalPushUps) {
       dispatchAndSave({ type: 'ADD_HISTORY', payload: {
         timestamp:    new Date().toISOString(),
@@ -342,10 +364,10 @@ export default function FightPreScreen() {
         {/* Monster label */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
           {monsters.map(m => (
-            <MonsterPortrait key={m.name} monster={m} size={monsters.length > 1 ? 58 : 80}/>
+            <MonsterPortrait key={m.displayName || m.name} monster={m} size={monsters.length > 1 ? 58 : 80}/>
           ))}
           <div>
-            <div className="title-medium">{monsters.map(m => m.name).join(' · ')}</div>
+            <div className="title-medium">{monsters.map(m => m.displayName || m.name).join(' · ')}</div>
             <div className="text-dim" style={{ fontSize: '11px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               {[...new Set(monsters.map(m => m.type))].join(' & ')} · Level {dungeon.levelId}
             </div>
@@ -489,11 +511,11 @@ export default function FightPreScreen() {
         <div className="panel panel-gold" style={{ padding: '14px', flexShrink: 0 }}>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
             {monsters.map(m => (
-              <MonsterPortrait key={m.name} monster={m} size={monsters.length > 1 ? 58 : 80}/>
+              <MonsterPortrait key={m.displayName || m.name} monster={m} size={monsters.length > 1 ? 58 : 80}/>
             ))}
             <div style={{ flex: 1 }}>
               <div className="title-medium" style={{ marginBottom: '4px' }}>
-                {monsters.map(m => m.name).join(' · ')}
+                {monsters.map(m => m.displayName || m.name).join(' · ')}
               </div>
               <div className="text-dim" style={{ fontSize: '11px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 {[...new Set(monsters.map(m => m.type))].join(' & ')} · Level {dungeon.levelId}
@@ -502,8 +524,8 @@ export default function FightPreScreen() {
           </div>
           <div className="divider" style={{ marginBottom: '8px' }} />
           {monsters.map(m => (
-            <div key={m.name} className="text-flavor" style={{ fontSize: '12px', lineHeight: 1.7, marginBottom: '4px' }}>
-              {monsters.length > 1 && <span style={{ color: 'var(--text-gold)', fontSize: '11px' }}>{m.name}: </span>}
+            <div key={m.displayName || m.name} className="text-flavor" style={{ fontSize: '12px', lineHeight: 1.7, marginBottom: '4px' }}>
+              {monsters.length > 1 && <span style={{ color: 'var(--text-gold)', fontSize: '11px' }}>{m.displayName || m.name}: </span>}
               {m.description}
             </div>
           ))}

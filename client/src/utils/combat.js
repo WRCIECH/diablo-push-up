@@ -99,7 +99,7 @@ export function calculateFight(player, monsters, pushUpData) {
       C.MINIMAL_DAMAGE_CHANCE
     ) * monster.damage;
 
-    monsterStats.push({ name: monster.name, easeSteps, dps: monsterDPS });
+    monsterStats.push({ name: monster.displayName || monster.name, easeSteps, dps: monsterDPS });
   }
 
   // MINIMAL_DAMAGE_PER_SECOND applied once per fight, not per monster

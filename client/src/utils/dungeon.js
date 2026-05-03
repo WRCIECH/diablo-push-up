@@ -1,3 +1,45 @@
+// ── Monster variant rolling ───────────────────────────────────────────────────
+
+// 1% boss, 9% strong, 90% normal. Butcher is always called directly, not through this.
+function pickVariant(baseName) {
+  const r = Math.random();
+  if (r < 0.01) return `${baseName} Boss`;
+  if (r < 0.10) return `Stronger ${baseName}`;
+  return baseName;
+}
+
+// Resolve a stored variant name back into a full monster object with multipliers applied.
+export function resolveMonster(variantName, monstersData) {
+  let variant = 'normal';
+  let baseName = variantName;
+  if (variantName.startsWith('Stronger '))  { variant = 'strong'; baseName = variantName.slice(9); }
+  else if (variantName.endsWith(' Boss'))   { variant = 'boss';   baseName = variantName.slice(0, -5); }
+
+  const base = monstersData.find(m => m.name === baseName);
+  if (!base) return null;
+
+  const displayName = variant === 'strong' ? `Stronger ${base.name}`
+                    : variant === 'boss'   ? `${base.name} Boss`
+                    : base.name;
+
+  if (variant === 'normal') return { ...base, variant: 'normal', displayName: base.name };
+
+  if (variant === 'strong') return {
+    ...base, variant: 'strong', displayName,
+    vitality:  Math.round(base.vitality  * 1.5),
+    exp:       Math.round(base.exp       * 1.5),
+    gold_drop: [Math.round(base.gold_drop[0] * 1.5), Math.round(base.gold_drop[1] * 1.5)],
+  };
+
+  // boss
+  return {
+    ...base, variant: 'boss', displayName,
+    vitality: Math.round(base.vitality * 2),
+    damage:   Math.round(base.damage   * 1.5),
+    exp:      Math.round(base.exp      * 2.5),
+  };
+}
+
 // ── Weighted random pick from pool ───────────────────────────────────────────
 
 function weightedPick(pool) {
@@ -55,14 +97,14 @@ export function generateDungeon(levelId, locationsData) {
       // Build monster list for fight / butcher nodes
       const monsters = [];
       if (place.type === 'fight') {
-        monsters.push(place.monster);
+        monsters.push(pickVariant(place.monster));
         const addProb = levelDef.additional_enemy_probability ?? 0;
         while (Math.random() < addProb) {
-          monsters.push(place.monster); // same monster only — mixed types cause mixed push-up types
+          monsters.push(pickVariant(place.monster));
         }
       }
       if (place.type === 'butcher') {
-        monsters.push('The Butcher'); // always solo — no additional enemies
+        monsters.push('The Butcher'); // always solo, never a variant
       }
 
       // Butcher uses fight node type so the map renders it as a normal fight room

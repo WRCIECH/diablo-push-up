@@ -158,3 +158,32 @@ export function rollLoot(monster, itemsData) {
 
   return null;
 }
+
+// Boss monsters always drop a magic or unique item (80/20 split).
+const BOSS_DROP_TABLE = [
+  { result: 'magic',  weight: 80 },
+  { result: 'unique', weight: 20 },
+];
+
+export function rollBossLoot(itemsData) {
+  const result   = weightedPick(BOSS_DROP_TABLE);
+  const base     = pickRandom(buildEquipmentPool(itemsData));
+  const key      = affixKey(base.slot);
+  const availPre = itemsData.prefixes[key] || [];
+  const availSuf = itemsData.suffixes[key] || [];
+
+  if (result === 'unique') {
+    const prefix = availPre.length ? pickRandom(availPre) : null;
+    const suffix = availSuf.length ? pickRandom(availSuf) : null;
+    const item   = createMagicItem(base, prefix, suffix);
+    item.quality = 'unique';
+    item.uid     = generateUID('unique');
+    return { type: 'item', item };
+  }
+
+  const wantPre = Math.random() < 0.6;
+  const wantSuf = Math.random() < 0.6;
+  const prefix  = (wantPre || !wantSuf) && availPre.length ? pickRandom(availPre) : null;
+  const suffix  = (wantSuf || !prefix)  && availSuf.length ? pickRandom(availSuf) : null;
+  return { type: 'item', item: createMagicItem(base, prefix, suffix) };
+}
