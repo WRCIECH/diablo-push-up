@@ -5,6 +5,7 @@ import { resolveItemName, qualityColor, getEffectiveStats, collectBonuses } from
 import { useMusic, getCurrentTrack } from '../hooks/useMusic.js';
 import { C, getMaxLife } from '../utils/combat.js';
 import ItemIcon from '../components/ItemIcon.jsx';
+import LifeOrb from '../components/LifeOrb.jsx';
 
 const CLASS_LABEL = { warrior: 'Warrior', rogue: 'Rogue' };
 const STAT_LABELS = { strength: 'Strength', dexterity: 'Dexterity', vitality: 'Vitality' };
@@ -371,11 +372,8 @@ function StatsPanel({ player, canAllocate, onAllocate }) {
           );
         })}
         <div className="divider" style={{ margin: '8px 0' }}/>
-        <div className="stat-row" style={{ padding: '4px 0' }}>
-          <span className="stat-label">Life</span>
-          <span className="text-red" style={{ fontSize: '15px', fontWeight: 700 }}>
-            {player.stats.life} / {maxLife}
-          </span>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '4px 0 8px' }}>
+          <LifeOrb current={player.stats.life} max={maxLife} size={72}/>
         </div>
         <div className="stat-row" style={{ padding: '4px 0' }}>
           <span className="stat-label">Gold</span>

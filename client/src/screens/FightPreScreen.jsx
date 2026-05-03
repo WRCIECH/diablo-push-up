@@ -6,6 +6,7 @@ import { rollBetween, generateUID } from '../utils/items.js';
 import { rollLoot, rollBossLoot } from '../utils/loot.js';
 import { getMonsters, resolveMonster } from '../utils/dungeon.js';
 import ItemIcon from '../components/ItemIcon.jsx';
+import LifeOrb from '../components/LifeOrb.jsx';
 
 // ── Potion drink sound (synthesised — no audio file needed) ──────────────────
 
@@ -31,42 +32,6 @@ function playPotionSound() {
 }
 
 // ── Life orb ──────────────────────────────────────────────────────────────────
-
-function LifeOrb({ current, max, size = 64 }) {
-  const ratio = max > 0 ? Math.max(0, Math.min(1, current / max)) : 0;
-  const r  = size / 2;
-  const fillY = size * (1 - ratio);
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-      <svg width={size} height={size} style={{ display: 'block' }}>
-        <defs>
-          <clipPath id="orb-shape">
-            <circle cx={r} cy={r} r={r - 2}/>
-          </clipPath>
-        </defs>
-        {/* Empty background */}
-        <circle cx={r} cy={r} r={r - 2} fill="#130202"/>
-        {/* Liquid fill */}
-        <g clipPath="url(#orb-shape)">
-          <rect x="0" y={fillY} width={size} height={size} fill="#7a0a0a"/>
-          {/* Ripple highlight at fill surface */}
-          {ratio > 0 && ratio < 1 && (
-            <rect x="0" y={fillY} width={size} height="3" fill="#cc2222" opacity="0.5"/>
-          )}
-        </g>
-        {/* Glass shine */}
-        <ellipse cx={r * 0.72} cy={r * 0.6} rx={r * 0.28} ry={r * 0.18}
-                 fill="white" opacity="0.12"/>
-        {/* Border */}
-        <circle cx={r} cy={r} r={r - 1} fill="none" stroke="#5a1212" strokeWidth="2"/>
-      </svg>
-      <div style={{ fontSize: '12px', color: ratio < 0.3 ? 'var(--red-text)' : 'var(--text-cream)',
-                    fontWeight: 600, letterSpacing: '0.04em' }}>
-        {Math.ceil(current)} <span style={{ color: 'var(--text-dim)', fontWeight: 400 }}>/ {Math.round(max)}</span>
-      </div>
-    </div>
-  );
-}
 
 // ── Monster portrait (SVG, type-coloured) ─────────────────────────────────────
 
@@ -398,16 +363,21 @@ export default function FightPreScreen() {
           </div>
         </div>
 
-        {/* Timer */}
+        {/* Timer + life orb */}
         <div className="panel" style={{ flexShrink: 0, position: 'relative' }}>
-          <TimerDisplay {...timerDisp} />
-          {!timerDisp.isDraining && (
-            <div style={{ textAlign: 'center', paddingBottom: '10px' }}>
-              <span className="text-dim" style={{ fontSize: '11px' }}>
-                {fightData.damagePerSecond.toFixed(1)} HP/s drain · {Math.round(fightData.maxLife)} max HP
-              </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '0 8px' }}>
+            <LifeOrb current={timerDisp.life} max={timerDisp.maxLife} size={64}/>
+            <div style={{ flex: 1 }}>
+              <TimerDisplay {...timerDisp} />
+              {!timerDisp.isDraining && (
+                <div style={{ textAlign: 'center', paddingBottom: '8px' }}>
+                  <span className="text-dim" style={{ fontSize: '11px' }}>
+                    {fightData.damagePerSecond.toFixed(1)} HP/s drain after prep
+                  </span>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
 
         {/* Push-up list */}
